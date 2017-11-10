@@ -6,7 +6,6 @@ import(
 
 
 type Hostname struct {
-    Style
 }
 
 func (h Hostname) String() string {

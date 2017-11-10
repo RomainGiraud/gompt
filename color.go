@@ -1,70 +1,123 @@
 package main
 
 import(
-    "github.com/fatih/color"
+    "fmt"
+    "bytes"
 )
 
-var convertColors = map[color.Attribute]color.Attribute {
-    color.FgBlack   : color.BgBlack,
-    color.FgRed     : color.BgRed,
-    color.FgGreen   : color.BgGreen,
-    color.FgYellow  : color.BgYellow,
-    color.FgBlue    : color.BgBlue,
-    color.FgMagenta : color.BgMagenta,
-    color.FgCyan    : color.BgCyan,
-    color.FgWhite   : color.BgWhite,
+const escape = "\x1b"
 
-    color.BgBlack   : color.FgBlack,
-    color.BgRed     : color.FgRed,
-    color.BgGreen   : color.FgGreen,
-    color.BgYellow  : color.FgYellow,
-    color.BgBlue    : color.FgBlue,
-    color.BgMagenta : color.FgMagenta,
-    color.BgCyan    : color.FgCyan,
-    color.BgWhite   : color.FgWhite,
+type Background int
+type Foreground int
+type Attribute int
+type Style func(*bytes.Buffer) error
+
+type Color struct {
+    element fmt.Stringer
+    styles []Style
 }
 
+func (c Color) String() string {
+    return ColorizeFn(c.styles...)(c.element.String())
+}
+
+func Colorize(str string, styles ...Style) string {
+    return ColorizeFn(styles...)(str)
+}
+
+func ColorizeFn(styles ...Style) func(str string) string {
+    return func(str string) string {
+        var buffer bytes.Buffer
+        for _, style := range styles {
+            err := style(&buffer)
+            if err != nil {
+                return ""
+            }
+        }
+        buffer.WriteString(str)
+        Reset(&buffer)
+        return buffer.String()
+    }
+}
+
+func Bg(bg Background) Style {
+    return func(buffer *bytes.Buffer) error {
+        fmt.Fprintf(buffer, "%s[%dm", escape, bg)
+        return nil
+    }
+}
+
+func Bg8(bg int) Style {
+    return func(buffer *bytes.Buffer) error {
+        fmt.Fprintf(buffer, "%s[48;5;%dm", escape, bg)
+        return nil
+    }
+}
+
+func Bg24(r int, g int, b int) Style {
+    return func(buffer *bytes.Buffer) error {
+        fmt.Fprintf(buffer, "%s[48;2;%d;%d;%dm", escape, r, g, b)
+        return nil
+    }
+}
+
+func Fg(fg Foreground) Style {
+    return func(buffer *bytes.Buffer) error {
+        fmt.Fprintf(buffer, "%s[%dm", escape, fg)
+        return nil
+    }
+}
+
+func Fg8(fg int) Style {
+    return func(buffer *bytes.Buffer) error {
+        fmt.Fprintf(buffer, "%s[38;5;%dm", escape, fg)
+        return nil
+    }
+}
+
+func Fg24(r int, g int, b int) Style {
+    return func(buffer *bytes.Buffer) error {
+        fmt.Fprintf(buffer, "%s[38;2;%d;%d;%dm", escape, r, g, b)
+        return nil
+    }
+}
+
+func Bold(buffer *bytes.Buffer) error {
+    fmt.Fprintf(buffer, "%s[1m", escape)
+    return nil
+}
+
+func Underline(buffer *bytes.Buffer) error {
+    fmt.Fprintf(buffer, "%s[4m", escape)
+    return nil
+}
+
+func Reset(buffer *bytes.Buffer) error {
+    fmt.Fprintf(buffer, "%s[0m", escape)
+    return nil
+}
+
+
+
 /*
-# Regular Colors
-\[\033[0;30m\] # Black
-\[\033[0;31m\] # Red
-\[\033[0;32m\] # Green
-\[\033[0;33m\] # Yellow
-\[\033[0;34m\] # Blue
-\[\033[0;35m\] # Purple
-\[\033[0;36m\] # Cyan
-\[\033[0;37m\] # White
+type Color struct {
+    Background
+}
 
-# High Intensty
-\[\033[0;90m\] # Black
-\[\033[0;91m\] # Red
-\[\033[0;92m\] # Green
-\[\033[0;93m\] # Yellow
-\[\033[0;94m\] # Blue
-\[\033[0;95m\] # Purple
-\[\033[0;96m\] # Cyan
-\[\033[0;97m\] # White
+func (c *Color) Bg(bg Background) *Color {
+    return c
+}
 
-# Background
-\[\033[40m\] # Black
-\[\033[41m\] # Red
-\[\033[42m\] # Green
-\[\033[43m\] # Yellow
-\[\033[44m\] # Blue
-\[\033[45m\] # Purple
-\[\033[46m\] # Cyan
-\[\033[47m\] # White
+//return fmt.Sprintf("\x1b[%d;47m%s\x1b[0m", 30, dir)
+func Bg(bg Background) (func(string) string) {
+    return func(str string) string {
+        return fmt.Sprintf("%s[%dm%s%s[0m", escape, bg, str, escape)
+    }
+}
 
-# High Intensty backgrounds
-\[\033[0;100m\] # Black
-\[\033[0;101m\] # Red
-\[\033[0;102m\] # Green
-\[\033[0;103m\] # Yellow
-\[\033[0;104m\] # Blue
-\[\033[10;95m\] # Purple
-\[\033[0;106m\] # Cyan
-\[\033[0;107m\] # White
-
-#Replace any leading leading 0; with 1; for bold colors
-#Replace any leading 0; with 4; to underline
+func Fg(fg Foreground) (func(string) string) {
+    return func(str string) string {
+        return fmt.Sprintf("%s[%dm%s%s[0m", escape, fg, str, escape)
+    }
+}
 */

@@ -3,25 +3,35 @@ package main
 import(
     "fmt"
     "flag"
-    "github.com/fatih/color"
     "prompt/segments"
+    "prompt/separators"
 )
 
 
-func Print(segments []segments.Segment) {
+type Elements []fmt.Stringer
+
+func (segments Elements) Print() {
     if len(segments) == 0 {
         panic("Empty prompt")
     }
 
-    sep := "\ue0b0"
     for i, j := 0, 1; i < len(segments); i, j = i+1, j+1 {
         s := segments[i]
+        fmt.Printf("%v", s)
+
+        /*
+        switch s.(type) {
+        case segments.Segment:
+            fmt.Printf("seg/")
+        case separators.Separator:
+            fmt.Printf("sep/")
+        }
+        */
+
+        /*
         color.Set(s.GetFg(), s.GetBg())
 
-        if i != 0 {
-            fmt.Printf(" ")
-        }
-        fmt.Printf("%v ", s)
+        fmt.Printf("%v", s)
 
         color.Unset()
         if j < len(segments) {
@@ -31,26 +41,32 @@ func Print(segments []segments.Segment) {
             color.Set(convertColors[s.GetBg()])
         }
         fmt.Printf("%v", sep)
+        */
     }
-    color.Unset()
-    fmt.Printf(" \n");
+    fmt.Printf("\n")
 }
 
 
 func main() {
     status := flag.Int("s", 0, "exit status")
     flag.Parse()
-    fmt.Println("=> ", *status)
 
+    //fmt.Println(Colorize("toto", Bg24(0, 155, 0), Fg(30)))
+    //fmt.Println(fmt.Sprintf(Color.Bg(46).Fg(30)("toto")))
 
-    seg := make([]segments.Segment, 0, 8)
-    seg = append(seg, segments.ExitStatus{
-        segments.Style{color.FgWhite, color.BgWhite},
-        segments.Style{color.FgWhite, color.BgRed},
-        *status})
-    seg = append(seg, segments.Path{ segments.Style{color.FgBlack, color.BgWhite}})
-    seg = append(seg, segments.Text{ segments.Style{color.FgWhite, color.BgBlue}, "rom"})
-    seg = append(seg, segments.Username{ segments.Style{color.FgWhite, color.BgGreen}})
-    seg = append(seg, segments.Hostname{ segments.Style{color.FgWhite, color.BgMagenta}})
-    Print(seg)
+    sep := separators.Transition{" > "}
+    //sep := separators.Transition{" \ue0b0 "}
+    seg := Elements{
+        Color{segments.Path{}, []Style{ Bg24(0, 155, 0), Fg(30), Underline }},
+        sep,
+        segments.ExitStatus{*status, "\u25CF"},
+        sep,
+        segments.Text{ "rom" },
+        sep,
+        segments.Username{},
+        sep,
+        segments.Hostname{},
+        sep,
+    }
+    seg.Print()
 }

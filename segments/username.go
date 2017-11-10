@@ -6,7 +6,6 @@ import(
 
 
 type Username struct {
-    Style
 }
 
 func (u Username) String() string {
