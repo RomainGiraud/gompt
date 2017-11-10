@@ -5,7 +5,6 @@ import(
 
 
 type Text struct {
-    Style
     Value string
 }
 

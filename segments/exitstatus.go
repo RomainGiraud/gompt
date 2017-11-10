@@ -1,30 +1,17 @@
 package segments
 
 import(
-    "github.com/fatih/color"
 )
 
 
 type ExitStatus struct {
-    StyleOk Style
-    StyleError Style
-    Value int
+    Status int
+    Value string
 }
 
 func (e ExitStatus) String() string {
-    return ""
-}
-
-func (e ExitStatus) GetFg() color.Attribute {
-    if e.Value != 0 {
-        return e.StyleError.Fg
+    if e.Status != 0 {
+        return "X"
     }
-    return e.StyleOk.Fg
-}
-
-func (e ExitStatus) GetBg() color.Attribute {
-    if e.Value != 0 {
-        return e.StyleError.Bg
-    }
-    return e.StyleOk.Bg
+    return e.Value
 }

@@ -7,7 +7,6 @@ import(
 
 
 type Path struct {
-    Style
 }
 
 func (p Path) String() string {
