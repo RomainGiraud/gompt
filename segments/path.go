@@ -10,6 +10,7 @@ import(
 
 
 type Path struct {
+    style color.StyleFmt
 }
 
 func (p Path) String() string {
@@ -17,7 +18,7 @@ func (p Path) String() string {
     if err != nil {
         log.Fatal(err)
     }
-    return dir
+    return p.style(dir)
 }
 
 type pathConfig struct {
@@ -29,5 +30,5 @@ func NewPath(bytes json.RawMessage, style color.StyleConfig) fmt.Stringer {
     if err != nil {
         log.Fatal(err)
     }
-    return &Path{}
+    return &Path{ style.GetFmt() }
 }

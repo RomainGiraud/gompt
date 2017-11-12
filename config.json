@@ -5,8 +5,16 @@
           },
           "style": {
               "type": "uni",
-              "fg": "150",
-              "bg": "150"
+              "fg": "30",
+              "bg": "42"
+          }
+        },
+        { "type": "separator",
+          "options": {
+              "text": "\ue0b0 "
+          },
+          "style": {
+              "type": "prev-next"
           }
         },
         { "type": "text",
