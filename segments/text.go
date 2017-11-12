@@ -9,11 +9,11 @@ import(
 
 
 type Text struct {
-    Value string
+    value string
 }
 
 func (t Text) String() string {
-    return t.Value
+    return t.value
 }
 
 type textConfig struct {

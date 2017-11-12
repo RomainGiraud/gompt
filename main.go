@@ -79,6 +79,7 @@ func main() {
     registeredSegmentCreators = make(map[string]SegmentCreator)
     RegisterSegmentCreator("path", segments.NewPath)
     RegisterSegmentCreator("text", segments.NewText)
+    RegisterSegmentCreator("separator", segments.NewSeparator)
 
     status      := flag.Int("s", 0, "exit status")
     configPath  := flag.String("c", "", "config file path")
