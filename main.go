@@ -1,14 +1,21 @@
 package main
 
 import(
+    "os"
     "fmt"
+    "log"
     "flag"
+    //"reflect"
+    "io/ioutil"
+    "encoding/json"
     "prompt/segments"
-    "prompt/separators"
+    "prompt/color"
+    //"prompt/separators"
 )
 
 
-type Elements []fmt.Stringer
+type Element fmt.Stringer
+type Elements []Element
 
 func (segments Elements) Print() {
     if len(segments) == 0 {
@@ -46,18 +53,63 @@ func (segments Elements) Print() {
     fmt.Printf("\n")
 }
 
+type Segment struct {
+    Type string `json:"type"`
+    Options json.RawMessage `json:"options"`
+    Style color.StyleConfig `json:"style,omitempty"`
+}
+
+type Config struct {
+    Segments []Segment `json:"segments"`
+}
+
+type SegmentCreator func(json.RawMessage, color.StyleConfig) fmt.Stringer
+
+var registeredSegmentCreators map[string]SegmentCreator
+
+func RegisterSegmentCreator(name string, fn SegmentCreator) {
+    registeredSegmentCreators[name] = fn
+}
+
+func CreateSegment(segment Segment) fmt.Stringer {
+    return registeredSegmentCreators[segment.Type](segment.Options, segment.Style)
+}
 
 func main() {
-    status := flag.Int("s", 0, "exit status")
+    registeredSegmentCreators = make(map[string]SegmentCreator)
+    RegisterSegmentCreator("path", segments.NewPath)
+    RegisterSegmentCreator("text", segments.NewText)
+
+    status      := flag.Int("s", 0, "exit status")
+    configPath  := flag.String("c", "", "config file path")
     flag.Parse()
+    _ = *status
+
+    var config Config
+    configFile, err := os.Open(*configPath)
+    if err != nil {
+        log.Panic("wrong config file specified")
+    }
+    byteValue, _ := ioutil.ReadAll(configFile)
+    err = json.Unmarshal(byteValue, &config)
+    if err != nil {
+        log.Panic("config file wrong format")
+    }
+
+    segs := make(Elements, 0, 8)
+    for _, segment := range config.Segments {
+        segs = append(segs, CreateSegment(segment))
+    }
+    segs.Print()
 
     //fmt.Println(Colorize("toto", Bg24(0, 155, 0), Fg(30)))
     //fmt.Println(fmt.Sprintf(Color.Bg(46).Fg(30)("toto")))
 
+    /*
     sep := separators.Transition{" > "}
     //sep := separators.Transition{" \ue0b0 "}
     seg := Elements{
-        Color{segments.Path{}, []Style{ Bg24(0, 155, 0), Fg(30), Underline }},
+        //Color{segments.Path{}, []Style{ Bg24(0, 155, 0), Fg(30), Underline }},
         sep,
         segments.ExitStatus{*status, "\u25CF"},
         sep,
@@ -69,4 +121,5 @@ func main() {
         sep,
     }
     seg.Print()
+    */
 }

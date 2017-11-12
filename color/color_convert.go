@@ -1,9 +1,9 @@
-package main
+package color
 
 import(
-    "github.com/fatih/color"
 )
 
+/*
 var convertColors = map[color.Attribute]color.Attribute {
     color.FgBlack   : color.BgBlack,
     color.FgRed     : color.BgRed,
@@ -23,6 +23,7 @@ var convertColors = map[color.Attribute]color.Attribute {
     color.BgCyan    : color.FgCyan,
     color.BgWhite   : color.FgWhite,
 }
+*/
 
 /*
 # Regular Colors
