@@ -1,0 +1,18 @@
+{
+    "segments": [
+        { "type": "path",
+          "options": {
+          },
+          "style": {
+              "type": "uni",
+              "fg": "150",
+              "bg": "150"
+          }
+        },
+        { "type": "text",
+          "options": {
+              "text": "coucou toi!"
+          }
+        }
+    ]
+}

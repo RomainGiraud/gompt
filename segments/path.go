@@ -3,6 +3,9 @@ package segments
 import(
     "os"
     "log"
+    "fmt"
+    "encoding/json"
+    "prompt/color"
 )
 
 
@@ -15,4 +18,16 @@ func (p Path) String() string {
         log.Fatal(err)
     }
     return dir
+}
+
+type pathConfig struct {
+}
+
+func NewPath(bytes json.RawMessage, style color.StyleConfig) fmt.Stringer {
+    var config pathConfig
+    err := json.Unmarshal(bytes, &config)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return &Path{}
 }
