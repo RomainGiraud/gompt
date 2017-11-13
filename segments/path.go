@@ -5,12 +5,11 @@ import(
     "os"
     "log"
     "encoding/json"
-    "prompt/color"
 )
 
 
 type Path struct {
-    style color.StyleFmt
+    style Style
 }
 
 func (p Path) Print(context Context, name string) {
@@ -18,17 +17,17 @@ func (p Path) Print(context Context, name string) {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Print(p.style(dir))
+    fmt.Print(p.style.Format(dir, context, name))
 }
 
 type pathConfig struct {
 }
 
-func NewPath(bytes json.RawMessage, style color.Style) Segment {
+func NewPath(bytes json.RawMessage, style Style) Segment {
     var config pathConfig
     err := json.Unmarshal(bytes, &config)
     if err != nil {
         log.Fatal(err)
     }
-    return &Path{ style.GetFmt() }
+    return &Path{ style }
 }

@@ -1,4 +1,4 @@
-package color
+package segments
 
 import(
     "strconv"
@@ -6,10 +6,8 @@ import(
 )
 
 
-type StyleFmt func(string) string
-
 type Style interface {
-    GetFmt() StyleFmt
+    Format(string, Context, string) string
 }
 
 func NewStyle(name string, options json.RawMessage) Style {
@@ -34,10 +32,10 @@ type StyleConfigUni struct {
     Bg string `json:"bg"`
 }
 
-func (s StyleConfigUni) GetFmt() StyleFmt {
+func (s StyleConfigUni) Format(str string, context Context, name string) string {
     fg, _ := strconv.Atoi(s.Fg)
     bg, _ := strconv.Atoi(s.Bg)
-    return ColorizeFn(Bg(Background(bg)), Fg(Foreground(fg)))
+    return Colorize(str, Bg(Background(bg)), Fg(Foreground(fg)))
 }
 
 type StyleConfigChameleon struct {
@@ -45,8 +43,8 @@ type StyleConfigChameleon struct {
     DefaultBg string `json:"default-bg"`
 }
 
-func (s StyleConfigChameleon) GetFmt() StyleFmt {
+func (s StyleConfigChameleon) Format(str string, context Context, name string) string {
     fg, _ := strconv.Atoi(s.DefaultFg)
     bg, _ := strconv.Atoi(s.DefaultBg)
-    return ColorizeFn(Bg(Background(bg)), Fg(Foreground(fg)))
+    return Colorize(str, Bg(Background(bg)), Fg(Foreground(fg)))
 }
