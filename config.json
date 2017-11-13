@@ -4,8 +4,8 @@
           "type": "path",
           "options": {
           },
-          "style": {
-              "type": "uni",
+          "style": "uni",
+          "style-options": {
               "fg": "30",
               "bg": "42"
           }
@@ -15,14 +15,32 @@
           "options": {
               "text": "\ue0b0 "
           },
-          "style": {
-              "type": "prev-next"
+          "style": "prev-next",
+          "style-options": {
+              "default-fg": "36",
+              "default-bg": "42"
+          }
+        },
+        { "name": "sep-end",
+          "type": "separator",
+          "options": {
+              "text": "\ue0b0 "
+          },
+          "style": "prev-next",
+          "style-options": {
+              "default-fg": "32",
+              "default-bg": "40"
           }
         },
         { "name": "msg",
           "type": "text",
           "options": {
               "text": "coucou toi!"
+          },
+          "style": "uni",
+          "style-options": {
+              "fg": "30",
+              "bg": "46"
           }
         }
     ],
@@ -30,6 +48,6 @@
         "msg",
         "sep",
         "dir",
-        "sep"
+        "sep-end"
     ]
 }

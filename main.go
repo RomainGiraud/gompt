@@ -53,8 +53,9 @@ func PrintPrompt(segments map[string]fmt.Stringer, order []string) {
 type Segment struct {
     Name string `json:"name"`
     Type string `json:"type"`
-    Options json.RawMessage `json:"options"`
-    Style color.StyleConfig `json:"style,omitempty"`
+    Options json.RawMessage `json:"options,omitempty"`
+    Style string `json:"style,omitempty"`
+    StyleOptions json.RawMessage `json:"style-options,omitempty"`
 }
 
 type Config struct {
@@ -62,7 +63,7 @@ type Config struct {
     Order []string `json:"prompt"`
 }
 
-type SegmentCreator func(json.RawMessage, color.StyleConfig) fmt.Stringer
+type SegmentCreator func(json.RawMessage, color.Style) fmt.Stringer
 
 var registeredSegmentCreators map[string]SegmentCreator
 
@@ -71,7 +72,7 @@ func RegisterSegmentCreator(name string, fn SegmentCreator) {
 }
 
 func CreateSegment(segment Segment) fmt.Stringer {
-    return registeredSegmentCreators[segment.Type](segment.Options, segment.Style)
+    return registeredSegmentCreators[segment.Type](segment.Options, color.NewStyle(segment.Style, segment.StyleOptions))
 }
 
 func main() {

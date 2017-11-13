@@ -9,23 +9,23 @@ const escape = "\x1b"
 
 type Background int
 type Foreground int
-type Attribute int
-type Style func(*bytes.Buffer) error
+type Decorator int
+type Attribute func(*bytes.Buffer) error
 
 type Color struct {
     element fmt.Stringer
-    styles []Style
+    styles []Attribute
 }
 
 func (c Color) String() string {
     return ColorizeFn(c.styles...)(c.element.String())
 }
 
-func Colorize(str string, styles ...Style) string {
+func Colorize(str string, styles ...Attribute) string {
     return ColorizeFn(styles...)(str)
 }
 
-func ColorizeFn(styles ...Style) func(str string) string {
+func ColorizeFn(styles ...Attribute) func(str string) string {
     return func(str string) string {
         var buffer bytes.Buffer
         for _, style := range styles {
@@ -40,42 +40,42 @@ func ColorizeFn(styles ...Style) func(str string) string {
     }
 }
 
-func Bg(bg Background) Style {
+func Bg(bg Background) Attribute {
     return func(buffer *bytes.Buffer) error {
         fmt.Fprintf(buffer, "%s[%dm", escape, bg)
         return nil
     }
 }
 
-func Bg8(bg int) Style {
+func Bg8(bg int) Attribute {
     return func(buffer *bytes.Buffer) error {
         fmt.Fprintf(buffer, "%s[48;5;%dm", escape, bg)
         return nil
     }
 }
 
-func Bg24(r int, g int, b int) Style {
+func Bg24(r int, g int, b int) Attribute {
     return func(buffer *bytes.Buffer) error {
         fmt.Fprintf(buffer, "%s[48;2;%d;%d;%dm", escape, r, g, b)
         return nil
     }
 }
 
-func Fg(fg Foreground) Style {
+func Fg(fg Foreground) Attribute {
     return func(buffer *bytes.Buffer) error {
         fmt.Fprintf(buffer, "%s[%dm", escape, fg)
         return nil
     }
 }
 
-func Fg8(fg int) Style {
+func Fg8(fg int) Attribute {
     return func(buffer *bytes.Buffer) error {
         fmt.Fprintf(buffer, "%s[38;5;%dm", escape, fg)
         return nil
     }
 }
 
-func Fg24(r int, g int, b int) Style {
+func Fg24(r int, g int, b int) Attribute {
     return func(buffer *bytes.Buffer) error {
         fmt.Fprintf(buffer, "%s[38;2;%d;%d;%dm", escape, r, g, b)
         return nil
