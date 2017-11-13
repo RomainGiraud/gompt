@@ -1,4 +1,4 @@
-package color
+package segments
 
 import(
     "fmt"
@@ -15,15 +15,6 @@ type Background int
 type Foreground int
 type Decorator int
 type Attribute func(*bytes.Buffer) error
-
-type Color struct {
-    element fmt.Stringer
-    styles []Attribute
-}
-
-func (c Color) String() string {
-    return ColorizeFn(c.styles...)(c.element.String())
-}
 
 func Colorize(str string, styles ...Attribute) string {
     return ColorizeFn(styles...)(str)

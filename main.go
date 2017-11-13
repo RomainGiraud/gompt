@@ -7,7 +7,6 @@ import(
     "io/ioutil"
     "encoding/json"
     "prompt/segments"
-    "prompt/color"
 )
 
 
@@ -24,7 +23,7 @@ type Segment struct {
     StyleOptions json.RawMessage `json:"style-options,omitempty"`
 }
 
-type SegmentCreator func(json.RawMessage, color.Style) segments.Segment
+type SegmentCreator func(json.RawMessage, segments.Style) segments.Segment
 
 var registeredSegmentCreators map[string]SegmentCreator
 
@@ -33,7 +32,7 @@ func RegisterSegmentCreator(name string, fn SegmentCreator) {
 }
 
 func CreateSegment(segment Segment) segments.Segment {
-    return registeredSegmentCreators[segment.Type](segment.Options, color.NewStyle(segment.Style, segment.StyleOptions))
+    return registeredSegmentCreators[segment.Type](segment.Options, segments.NewStyle(segment.Style, segment.StyleOptions))
 }
 
 func main() {
