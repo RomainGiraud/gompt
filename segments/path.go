@@ -24,7 +24,7 @@ func (p Path) String() string {
 type pathConfig struct {
 }
 
-func NewPath(bytes json.RawMessage, style color.StyleConfig) fmt.Stringer {
+func NewPath(bytes json.RawMessage, style color.Style) fmt.Stringer {
     var config pathConfig
     err := json.Unmarshal(bytes, &config)
     if err != nil {

@@ -14,14 +14,14 @@ type Separator struct {
 }
 
 func (s Separator) String() string {
-    return s.value
+    return s.style(s.value)
 }
 
 type separatorConfig struct {
     Text string `json:"text"`
 }
 
-func NewSeparator(bytes json.RawMessage, style color.StyleConfig) fmt.Stringer {
+func NewSeparator(bytes json.RawMessage, style color.Style) fmt.Stringer {
     var config separatorConfig
     err := json.Unmarshal(bytes, &config)
     if err != nil {
