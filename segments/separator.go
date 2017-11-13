@@ -1,8 +1,8 @@
 package segments
 
 import(
-    "log"
     "fmt"
+    "log"
     "encoding/json"
     "prompt/color"
 )
@@ -13,15 +13,15 @@ type Separator struct {
     value string
 }
 
-func (s Separator) String() string {
-    return s.style(s.value)
+func (s Separator) Print(context Context, name string) {
+    fmt.Print(s.style(s.value))
 }
 
 type separatorConfig struct {
     Text string `json:"text"`
 }
 
-func NewSeparator(bytes json.RawMessage, style color.Style) fmt.Stringer {
+func NewSeparator(bytes json.RawMessage, style color.Style) Segment {
     var config separatorConfig
     err := json.Unmarshal(bytes, &config)
     if err != nil {

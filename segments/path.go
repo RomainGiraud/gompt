@@ -1,9 +1,9 @@
 package segments
 
 import(
+    "fmt"
     "os"
     "log"
-    "fmt"
     "encoding/json"
     "prompt/color"
 )
@@ -13,18 +13,18 @@ type Path struct {
     style color.StyleFmt
 }
 
-func (p Path) String() string {
+func (p Path) Print(context Context, name string) {
     dir, err := os.Getwd()
     if err != nil {
         log.Fatal(err)
     }
-    return p.style(dir)
+    fmt.Print(p.style(dir))
 }
 
 type pathConfig struct {
 }
 
-func NewPath(bytes json.RawMessage, style color.Style) fmt.Stringer {
+func NewPath(bytes json.RawMessage, style color.Style) Segment {
     var config pathConfig
     err := json.Unmarshal(bytes, &config)
     if err != nil {
