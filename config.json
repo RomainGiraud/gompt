@@ -1,6 +1,7 @@
 {
     "segments": [
-        { "type": "path",
+        { "name": "dir",
+          "type": "path",
           "options": {
           },
           "style": {
@@ -9,7 +10,8 @@
               "bg": "42"
           }
         },
-        { "type": "separator",
+        { "name": "sep",
+          "type": "separator",
           "options": {
               "text": "\ue0b0 "
           },
@@ -17,10 +19,17 @@
               "type": "prev-next"
           }
         },
-        { "type": "text",
+        { "name": "msg",
+          "type": "text",
           "options": {
               "text": "coucou toi!"
           }
         }
+    ],
+    "prompt": [
+        "msg",
+        "sep",
+        "dir",
+        "sep"
     ]
 }

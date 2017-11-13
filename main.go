@@ -14,17 +14,14 @@ import(
 )
 
 
-type Element fmt.Stringer
-type Elements []Element
-
-func (segments Elements) Print() {
-    if len(segments) == 0 {
+func PrintPrompt(segments map[string]fmt.Stringer, order []string) {
+    if len(segments) == 0 || len(order) == 0 {
         panic("Empty prompt")
     }
 
-    for i, j := 0, 1; i < len(segments); i, j = i+1, j+1 {
-        s := segments[i]
-        fmt.Printf("%v", s)
+    for i, j := 0, 1; i < len(order); i, j = i+1, j+1 {
+        curr := order[i]
+        fmt.Printf("%v", segments[curr])
 
         /*
         switch s.(type) {
@@ -54,6 +51,7 @@ func (segments Elements) Print() {
 }
 
 type Segment struct {
+    Name string `json:"name"`
     Type string `json:"type"`
     Options json.RawMessage `json:"options"`
     Style color.StyleConfig `json:"style,omitempty"`
@@ -61,6 +59,7 @@ type Segment struct {
 
 type Config struct {
     Segments []Segment `json:"segments"`
+    Order []string `json:"prompt"`
 }
 
 type SegmentCreator func(json.RawMessage, color.StyleConfig) fmt.Stringer
@@ -97,11 +96,11 @@ func main() {
         log.Panic("config file wrong format")
     }
 
-    segs := make(Elements, 0, 8)
+    segs := make(map[string]fmt.Stringer)
     for _, segment := range config.Segments {
-        segs = append(segs, CreateSegment(segment))
+        segs[segment.Name] = CreateSegment(segment)
     }
-    segs.Print()
+    PrintPrompt(segs, config.Order)
 
     //fmt.Println(Colorize("toto", Bg24(0, 155, 0), Fg(30)))
     //fmt.Println(fmt.Sprintf(Color.Bg(46).Fg(30)("toto")))
