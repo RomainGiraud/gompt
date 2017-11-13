@@ -5,6 +5,10 @@ import(
     "bytes"
 )
 
+//fmt.Println(Colorize("toto", Bg24(0, 155, 0), Fg(30)))
+//fmt.Println(fmt.Sprintf(Color.Bg(46).Fg(30)("toto")))
+
+
 const escape = "\x1b"
 
 type Background int
