@@ -12,8 +12,8 @@ type Separator struct {
     value string
 }
 
-func (s Separator) Print(context Context, name string) {
-    fmt.Print(s.style.Format(s.value, context, name))
+func (s Separator) Print(context Context, index int) {
+    fmt.Print(s.style.Format(s.value, context, index))
 }
 
 func (s Separator) GetStyle() Style {

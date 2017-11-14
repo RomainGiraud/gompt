@@ -9,7 +9,7 @@ import(
 
 
 type Style interface {
-    Format(string, Context, string) string
+    Format(string, Context, int) string
     GetBg() Background
     GetFg() Foreground
 }
@@ -37,7 +37,7 @@ type StyleUni struct {
     bg Background
 }
 
-func (s StyleUni) Format(str string, context Context, name string) string {
+func (s StyleUni) Format(str string, context Context, index int) string {
     return Colorize(str, Bg(s.bg), Fg(s.fg))
 }
 
@@ -62,21 +62,11 @@ func NewStyleUni(config StyleConfigUni) Style {
 
 
 type StyleChameleon struct {
-    fg Foreground
-    bg Background
+    defaultFg Foreground
+    defaultBg Background
 }
 
-func SliceIndex(array []string, str string) int {
-    for i := 0; i < len(array); i++ {
-        if array[i] == str {
-            return i
-        }
-    }
-    return -1
-}
-
-func (s StyleChameleon) Format(str string, context Context, name string) string {
-    index := SliceIndex(context.Order, name)
+func (s StyleChameleon) Format(str string, context Context, index int) string {
     if index == -1 {
         log.Panic("ERROR during style formatting")
     }
@@ -86,12 +76,13 @@ func (s StyleChameleon) Format(str string, context Context, name string) string 
         next = index + 1
     }
 
-    fg := s.fg
+    fg := s.defaultFg
     if prev != -1 {
-        fg = BgToFg(context.Segments[context.Order[prev]].GetStyle().GetBg())
+        tmp := context.Segments[context.Order[prev]].GetStyle().GetBg()
+        fg = BgToFg(tmp)
     }
 
-    bg := s.bg
+    bg := s.defaultBg
     if next != -1 {
         bg = context.Segments[context.Order[next]].GetStyle().GetBg()
     }
@@ -100,16 +91,16 @@ func (s StyleChameleon) Format(str string, context Context, name string) string 
 }
 
 func (s StyleChameleon) GetBg() Background {
-    return s.bg
+    return s.defaultBg
 }
 
 func (s StyleChameleon) GetFg() Foreground {
-    return s.fg
+    return s.defaultFg
 }
 
 type StyleConfigChameleon struct {
-    DefaultFg string `json:"default-fg"`
-    DefaultBg string `json:"default-bg"`
+    DefaultFg string `json:"default-fg,omitempty"`
+    DefaultBg string `json:"default-bg,omitempty"`
 }
 
 func NewStyleChameleon(config StyleConfigChameleon) Style {

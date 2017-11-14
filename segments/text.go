@@ -12,8 +12,8 @@ type Text struct {
     value string
 }
 
-func (t Text) Print(context Context, name string) {
-    fmt.Print(t.style.Format(t.value, context, name))
+func (t Text) Print(context Context, index int) {
+    fmt.Print(t.style.Format(t.value, context, index))
 }
 
 func (t Text) GetStyle() Style {

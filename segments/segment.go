@@ -6,7 +6,7 @@ import(
 
 
 type Segment interface {
-    Print(Context, string)
+    Print(Context, int)
     GetStyle() Style
 }
 
@@ -27,33 +27,8 @@ func (c Context) Display() {
     }
 
     for i, j := 0, 1; i < len(c.Order); i, j = i+1, j+1 {
-        curr := c.Order[i]
-        seg := c.Segments[curr]
-        seg.Print(c, curr)
-
-        /*
-        switch s.(type) {
-        case segments.Segment:
-            fmt.Printf("seg/")
-        case separators.Separator:
-            fmt.Printf("sep/")
-        }
-        */
-
-        /*
-        color.Set(s.GetFg(), s.GetBg())
-
-        fmt.Printf("%v", s)
-
-        color.Unset()
-        if j < len(segments) {
-            sn := segments[j]
-            color.Set(convertColors[s.GetBg()], sn.GetBg())
-        } else {
-            color.Set(convertColors[s.GetBg()])
-        }
-        fmt.Printf("%v", sep)
-        */
+        seg := c.Segments[c.Order[i]]
+        seg.Print(c, i)
     }
     fmt.Printf("\n")
 }

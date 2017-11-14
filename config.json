@@ -7,7 +7,7 @@
           "style": "uni",
           "style-options": {
               "fg": "30",
-              "bg": "42"
+              "bg": "45"
           }
         },
         { "name": "sep",
@@ -28,8 +28,6 @@
           },
           "style": "prev-next",
           "style-options": {
-              "default-fg": "32",
-              "default-bg": "40"
           }
         },
         { "name": "msg",
