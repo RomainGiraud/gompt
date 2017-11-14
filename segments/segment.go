@@ -7,6 +7,7 @@ import(
 
 type Segment interface {
     Print(Context, string)
+    GetStyle() Style
 }
 
 type Arguments struct {

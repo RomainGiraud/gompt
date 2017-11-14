@@ -16,6 +16,60 @@ type Foreground int
 type Decorator int
 type Attribute func(*bytes.Buffer) error
 
+const(
+    FgBlack     Foreground = iota + 30
+    FgRed       Foreground = iota + 31
+    FgGreen     Foreground = iota + 32
+    FgYellow    Foreground = iota + 33
+    FgBlue      Foreground = iota + 34
+    FgMagenta   Foreground = iota + 35
+    FgCyan      Foreground = iota + 36
+    FgWhite     Foreground = iota + 37
+    FgDefault   Foreground = iota + 39
+)
+
+const(
+    BgBlack     Background = iota + 40
+    BgRed       Background = iota + 41
+    BgGreen     Background = iota + 42
+    BgYellow    Background = iota + 43
+    BgBlue      Background = iota + 44
+    BgMagenta   Background = iota + 45
+    BgCyan      Background = iota + 46
+    BgWhite     Background = iota + 47
+    BgDefault   Background = iota + 49
+)
+
+func FgToBg(fg Foreground) Background {
+    switch fg {
+    case FgBlack    : return BgBlack;
+    case FgRed      : return BgRed;
+    case FgGreen    : return BgGreen;
+    case FgYellow   : return BgYellow;
+    case FgBlue     : return BgBlue;
+    case FgMagenta  : return BgMagenta;
+    case FgCyan     : return BgCyan;
+    case FgWhite    : return BgWhite;
+    case FgDefault  : return BgDefault;
+    default         : return BgDefault;
+    }
+}
+
+func BgToFg(bg Background) Foreground {
+    switch bg {
+    case BgBlack    : return FgBlack;
+    case BgRed      : return FgRed;
+    case BgGreen    : return FgGreen;
+    case BgYellow   : return FgYellow;
+    case BgBlue     : return FgBlue;
+    case BgMagenta  : return FgMagenta;
+    case BgCyan     : return FgCyan;
+    case BgWhite    : return FgWhite;
+    case BgDefault  : return FgDefault;
+    default         : return FgDefault;
+    }
+}
+
 func Colorize(str string, styles ...Attribute) string {
     return ColorizeFn(styles...)(str)
 }

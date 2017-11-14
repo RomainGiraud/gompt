@@ -16,6 +16,10 @@ func (t Text) Print(context Context, name string) {
     fmt.Print(t.style.Format(t.value, context, name))
 }
 
+func (t Text) GetStyle() Style {
+    return t.style
+}
+
 type textConfig struct {
     Text string `json:"text"`
 }
