@@ -31,7 +31,7 @@
           }
         },
         { "name": "msg",
-          "type": "text",
+          "type": "exit-status",
           "options": {
               "text": "coucou toi!"
           },
