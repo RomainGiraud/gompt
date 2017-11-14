@@ -20,6 +20,10 @@ func (p Path) Print(context Context, name string) {
     fmt.Print(p.style.Format(dir, context, name))
 }
 
+func (p Path) GetStyle() Style {
+    return p.style
+}
+
 type pathConfig struct {
 }
 
