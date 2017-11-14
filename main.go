@@ -37,9 +37,12 @@ func CreateSegment(segment Segment) segments.Segment {
 
 func main() {
     registeredSegmentCreators = make(map[string]SegmentCreator)
-    RegisterSegmentCreator("path", segments.NewPath)
-    RegisterSegmentCreator("text", segments.NewText)
-    RegisterSegmentCreator("separator", segments.NewSeparator)
+    RegisterSegmentCreator("exit-status", segments.NewExitStatus)
+    RegisterSegmentCreator("hostname"   , segments.NewHostname)
+    RegisterSegmentCreator("path"       , segments.NewPath)
+    RegisterSegmentCreator("separator"  , segments.NewSeparator)
+    RegisterSegmentCreator("text"       , segments.NewText)
+    RegisterSegmentCreator("username"   , segments.NewUsername)
 
     var context segments.Context
     flag.IntVar(&context.Args.Status, "s", 0, "exit status")
