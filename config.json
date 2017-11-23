@@ -1,51 +1,50 @@
 {
     "segments": [
-        { "name": "dir",
-          "type": "path",
-          "options": {
-          },
-          "style": "uni",
-          "style-options": {
-              "fg": "30",
-              "bg": "45"
+        { "type": "text",
+          "text": "toto",
+          "style": {
+              "type": "uni",
+              "fg": "blue",
+              "bg": "white"
           }
         },
-        { "name": "sep",
-          "type": "separator",
-          "options": {
-              "text": "\ue0b0 "
-          },
-          "style": "prev-next",
-          "style-options": {
-              "default-fg": "36",
-              "default-bg": "42"
+        { "type": "separator",
+          "text": "\ue0b0",
+          "style": {
+              "type": "cham",
+              "default-fg": "blue",
+              "default-bg": "white"
           }
         },
-        { "name": "sep-end",
-          "type": "separator",
-          "options": {
-              "text": "\ue0b0 "
+        { "type": "exit-status",
+          "text-success": "V",
+          "style-success": {
+              "type": "uni",
+              "fg": "red",
+              "bg": "yellow"
           },
-          "style": "prev-next",
-          "style-options": {
+          "text-error": "X",
+          "style-error": {
+              "type": "uni",
+              "fg": "black",
+              "bg": "red"
           }
         },
-        { "name": "msg",
-          "type": "exit-status",
-          "options": {
-              "text": "coucou toi!"
-          },
-          "style": "uni",
-          "style-options": {
-              "fg": "30",
-              "bg": "46"
+        { "type": "separator",
+          "text": "\ue0b0",
+          "style": {
+              "type": "cham",
+              "default-fg": "blue",
+              "default-bg": "blue"
+          }
+        },
+        { "type": "separator",
+          "text": "\ue0b0",
+          "style": {
+              "type": "uni",
+              "fg": "green",
+              "bg": "default"
           }
         }
-    ],
-    "prompt": [
-        "msg",
-        "sep",
-        "dir",
-        "sep-end"
     ]
 }

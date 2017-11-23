@@ -2,9 +2,7 @@ package segments
 
 import(
     "fmt"
-    "log"
     "os/user"
-    "encoding/json"
 )
 
 
@@ -17,18 +15,19 @@ func (u Username) Print(context Context, index int) {
     fmt.Print(u.style.Format(uc.Username, context, index))
 }
 
-func (u Username) GetStyle() Style {
+func (u Username) GetStyle(context Context, index int) Style {
     return u.style
 }
 
-type usernameConfig struct {
+func NewUsername(style Style) Segment {
+    return &Username{ style }
 }
 
-func NewUsername(bytes json.RawMessage, style Style) Segment {
-    var config usernameConfig
-    err := json.Unmarshal(bytes, &config)
-    if err != nil {
-        log.Fatal(err)
-    }
+func LoadUsername(config map[string]interface{}) Segment {
+    var style, _ = LoadStyle(config["style"])
     return &Username{ style }
+}
+
+func init() {
+    RegisterSegmentLoader("username", LoadUsername)
 }

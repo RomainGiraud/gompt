@@ -2,9 +2,10 @@ package segments
 
 import(
     _ "fmt"
-    "log"
-    "strconv"
-    "encoding/json"
+    _ "log"
+    "errors"
+    _ "strconv"
+    _ "encoding/json"
 )
 
 
@@ -14,23 +15,40 @@ type Style interface {
     GetFg() Foreground
 }
 
-func NewStyle(name string, options json.RawMessage) Style {
-    var style Style
-    switch name {
-    case "uni":
-        var conf StyleConfigUni
-        json.Unmarshal(options, &conf)
-        style = NewStyleUni(conf)
-    case "prev-next":
-        var conf StyleConfigChameleon
-        json.Unmarshal(options, &conf)
-        style = NewStyleChameleon(conf)
-    default:
-        style = nil
-    }
-    return style
+
+func init() {
+    RegisterStyleLoader("uni", LoadStyleUni)
+    RegisterStyleLoader("cham", LoadStyleChameleon)
 }
 
+type StyleLoader func(map[string]interface{}) Style
+
+var styleLoaders = map[string]StyleLoader{}
+
+func RegisterStyleLoader(name string, fn StyleLoader) {
+    styleLoaders[name] = fn
+}
+
+
+func LoadStyle(conf interface{}) (Style, error) {
+    config, ok := conf.(map[string]interface{})
+    if ! ok {
+        return nil, errors.New("LoadStyle: cannot parse configuration")
+    }
+
+    typeName, ok := config["type"].(string);
+    if ! ok {
+        return nil, errors.New("LoadStyle: key 'type' does not exists in configuration")
+    }
+
+    val, ok := styleLoaders[typeName];
+    if ! ok {
+        panic("unknown style type: " + typeName)
+        return nil, errors.New("unknown style type: " + typeName)
+    }
+
+    return val(config), nil
+}
 
 type StyleUni struct {
     fg Foreground
@@ -49,15 +67,14 @@ func (s StyleUni) GetFg() Foreground {
     return s.fg
 }
 
-type StyleConfigUni struct {
-    Fg string `json:"fg"`
-    Bg string `json:"bg"`
+func NewStyleUni(fg Foreground, bg Background) Style {
+    return &StyleUni{ fg, bg }
 }
 
-func NewStyleUni(config StyleConfigUni) Style {
-    fg, _ := strconv.Atoi(config.Fg)
-    bg, _ := strconv.Atoi(config.Bg)
-    return &StyleUni{ Foreground(fg), Background(bg) }
+func LoadStyleUni(config map[string]interface{}) Style {
+    var fg, _ = config["fg"].(string)
+    var bg, _ = config["bg"].(string)
+    return &StyleUni{ StrToFg(fg), StrToBg(bg) }
 }
 
 
@@ -67,24 +84,20 @@ type StyleChameleon struct {
 }
 
 func (s StyleChameleon) Format(str string, context Context, index int) string {
-    if index == -1 {
-        log.Panic("ERROR during style formatting")
-    }
-
     prev, next := index - 1, -1
-    if index + 1 < len(context.Order) {
+    if index + 1 < len(context.Segments) {
         next = index + 1
     }
 
-    fg := s.defaultFg
+    fg := FgDefault
     if prev != -1 {
-        tmp := context.Segments[context.Order[prev]].GetStyle().GetBg()
+        tmp := context.Segments[prev].GetStyle(context, index).GetBg()
         fg = BgToFg(tmp)
     }
 
-    bg := s.defaultBg
+    bg := BgDefault
     if next != -1 {
-        bg = context.Segments[context.Order[next]].GetStyle().GetBg()
+        bg = context.Segments[next].GetStyle(context, index).GetBg()
     }
 
     return Colorize(str, Bg(bg), Fg(fg))
@@ -98,13 +111,12 @@ func (s StyleChameleon) GetFg() Foreground {
     return s.defaultFg
 }
 
-type StyleConfigChameleon struct {
-    DefaultFg string `json:"default-fg,omitempty"`
-    DefaultBg string `json:"default-bg,omitempty"`
+func NewStyleChameleon() Style {
+    return &StyleChameleon{ FgDefault, BgDefault }
 }
 
-func NewStyleChameleon(config StyleConfigChameleon) Style {
-    fg, _ := strconv.Atoi(config.DefaultFg)
-    bg, _ := strconv.Atoi(config.DefaultBg)
-    return &StyleChameleon{ Foreground(fg), Background(bg) }
+func LoadStyleChameleon(config map[string]interface{}) Style {
+    var fg, _ = config["default-fg"].(string)
+    var bg, _ = config["default-bg"].(string)
+    return &StyleChameleon{ StrToFg(fg), StrToBg(bg) }
 }

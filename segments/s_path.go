@@ -4,7 +4,6 @@ import(
     "fmt"
     "os"
     "log"
-    "encoding/json"
 )
 
 
@@ -20,18 +19,19 @@ func (p Path) Print(context Context, index int) {
     fmt.Print(p.style.Format(dir, context, index))
 }
 
-func (p Path) GetStyle() Style {
+func (p Path) GetStyle(context Context, index int) Style {
     return p.style
 }
 
-type pathConfig struct {
+func NewPath(style Style) Segment {
+    return &Path{ style }
 }
 
-func NewPath(bytes json.RawMessage, style Style) Segment {
-    var config pathConfig
-    err := json.Unmarshal(bytes, &config)
-    if err != nil {
-        log.Fatal(err)
-    }
+func LoadPath(config map[string]interface{}) Segment {
+    var style, _ = LoadStyle(config["style"])
     return &Path{ style }
+}
+
+func init() {
+    RegisterSegmentLoader("path", LoadPath)
 }

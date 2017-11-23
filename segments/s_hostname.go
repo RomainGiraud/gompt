@@ -2,9 +2,7 @@ package segments
 
 import(
     "fmt"
-    "log"
     "os"
-    "encoding/json"
 )
 
 
@@ -17,18 +15,19 @@ func (h Hostname) Print(context Context, index int) {
     fmt.Print(h.style.Format(n, context, index))
 }
 
-func (h Hostname) GetStyle() Style {
+func (h Hostname) GetStyle(context Context, index int) Style {
     return h.style
 }
 
-type hostnameConfig struct {
+func NewHostname(style Style) Segment {
+    return &Hostname{ style }
 }
 
-func NewHostname(bytes json.RawMessage, style Style) Segment {
-    var config hostnameConfig
-    err := json.Unmarshal(bytes, &config)
-    if err != nil {
-        log.Fatal(err)
-    }
+func LoadHostname(config map[string]interface{}) Segment {
+    var style, _ = LoadStyle(config["style"])
     return &Hostname{ style }
+}
+
+func init() {
+    RegisterSegmentLoader("hostname", LoadHostname)
 }

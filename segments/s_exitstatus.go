@@ -2,35 +2,44 @@ package segments
 
 import(
     "fmt"
-    "log"
-    "encoding/json"
 )
 
 
 type ExitStatus struct {
-    style Style
+    styleSuccess Style
+    styleError Style
+    textSuccess string
+    textError string
 }
 
 func (e ExitStatus) Print(context Context, index int) {
     if context.Args.Status == 0 {
-        fmt.Print(e.style.Format("OK", context, index))
+        fmt.Print(e.styleSuccess.Format(e.textSuccess, context, index))
     } else {
-        fmt.Print(e.style.Format("NO", context, index))
+        fmt.Print(e.styleError.Format(e.textError, context, index))
     }
 }
 
-func (e ExitStatus) GetStyle() Style {
-    return e.style
-}
-
-type exitStatusConfig struct {
-}
-
-func NewExitStatus(bytes json.RawMessage, style Style) Segment {
-    var config exitStatusConfig
-    err := json.Unmarshal(bytes, &config)
-    if err != nil {
-        log.Fatal(err)
+func (e ExitStatus) GetStyle(context Context, index int) Style {
+    if context.Args.Status == 0 {
+        return e.styleSuccess
+    } else {
+        return e.styleError
     }
-    return &ExitStatus{ style }
+}
+
+func NewExitStatus(styleSuccess Style, styleError Style, textSuccess string, textError string) Segment {
+    return &ExitStatus{ styleSuccess, styleError, textSuccess, textError }
+}
+
+func LoadExitStatus(config map[string]interface{}) Segment {
+    var sSuccess, _ = LoadStyle(config["style-success"])
+    var sError,   _ = LoadStyle(config["style-error"])
+    var tSuccess, _ = config["text-success"].(string)
+    var tError,   _ = config["text-error"].(string)
+    return &ExitStatus{ sSuccess, sError, tSuccess, tError }
+}
+
+func init() {
+    RegisterSegmentLoader("exit-status", LoadExitStatus)
 }

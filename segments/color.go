@@ -40,6 +40,36 @@ const(
     BgDefault   Background = 49
 )
 
+func StrToFg(str string) Foreground {
+    switch str {
+    case "black"    : return FgBlack
+    case "red"      : return FgRed
+    case "green"    : return FgGreen
+    case "yellow"   : return FgYellow
+    case "blue"     : return FgBlue
+    case "magenta"  : return FgMagenta
+    case "cyan"     : return FgCyan
+    case "white"    : return FgWhite
+    case "default"  : return FgDefault
+    default         : return FgBlack
+    }
+}
+
+func StrToBg(str string) Background {
+    switch str {
+    case "black"    : return BgBlack
+    case "red"      : return BgRed
+    case "green"    : return BgGreen
+    case "yellow"   : return BgYellow
+    case "blue"     : return BgBlue
+    case "magenta"  : return BgMagenta
+    case "cyan"     : return BgCyan
+    case "white"    : return BgWhite
+    case "default"  : return BgDefault
+    default         : return BgBlack
+    }
+}
+
 func FgToBg(fg Foreground) Background {
     switch fg {
     case FgBlack    : return BgBlack
@@ -51,7 +81,7 @@ func FgToBg(fg Foreground) Background {
     case FgCyan     : return BgCyan
     case FgWhite    : return BgWhite
     case FgDefault  : return BgDefault
-    default         : return BgBlack
+    default         : return BgDefault
     }
 }
 
@@ -66,7 +96,7 @@ func BgToFg(bg Background) Foreground {
     case BgCyan     : return FgCyan
     case BgWhite    : return FgWhite
     case BgDefault  : return FgDefault
-    default         : return FgBlack
+    default         : return FgDefault
     }
 }
 
