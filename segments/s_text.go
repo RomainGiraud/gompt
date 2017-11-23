@@ -2,8 +2,7 @@ package segments
 
 import(
     "fmt"
-    "log"
-    "encoding/json"
+    "os"
 )
 
 
@@ -13,22 +12,23 @@ type Text struct {
 }
 
 func (t Text) Print(context Context, index int) {
-    fmt.Print(t.style.Format(t.value, context, index))
+    fmt.Print(t.style.Format(os.ExpandEnv(t.value), context, index))
 }
 
-func (t Text) GetStyle() Style {
+func (t Text) GetStyle(context Context, index int) Style {
     return t.style
 }
 
-type textConfig struct {
-    Text string `json:"text"`
+func NewText(style Style, text string) Segment {
+    return &Text{ style, text }
 }
 
-func NewText(bytes json.RawMessage, style Style) Segment {
-    var config textConfig
-    err := json.Unmarshal(bytes, &config)
-    if err != nil {
-        log.Fatal(err)
-    }
-    return &Text{ style, config.Text }
+func LoadText(config map[string]interface{}) Segment {
+    var style, _ = LoadStyle(config["style"])
+    var text, _  = config["text"].(string)
+    return &Text{ style, text }
+}
+
+func init() {
+    RegisterSegmentLoader("text", LoadText)
 }

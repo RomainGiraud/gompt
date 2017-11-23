@@ -2,8 +2,8 @@ package segments
 
 import(
     "fmt"
-    "log"
-    "encoding/json"
+    _"log"
+    _"encoding/json"
 )
 
 
@@ -16,19 +16,19 @@ func (s Separator) Print(context Context, index int) {
     fmt.Print(s.style.Format(s.value, context, index))
 }
 
-func (s Separator) GetStyle() Style {
+func (s Separator) GetStyle(context Context, index int) Style {
     return s.style
 }
 
-type separatorConfig struct {
-    Text string `json:"text"`
+func NewSeparator(text string, style Style) Segment {
+    return &Separator{ style, text }
 }
 
-func NewSeparator(bytes json.RawMessage, style Style) Segment {
-    var config separatorConfig
-    err := json.Unmarshal(bytes, &config)
-    if err != nil {
-        log.Fatal(err)
-    }
-    return &Separator{ style, config.Text }
+func LoadSeparator(config map[string]interface{}) Segment {
+    var style, _ = LoadStyle(config["style"])
+    return &Separator{ style, config["text"].(string) }
+}
+
+func init() {
+    RegisterSegmentLoader("separator", LoadSeparator)
 }
