@@ -11,8 +11,8 @@ import(
 
 type Style interface {
     Format(string, Context, int) string
-    GetBg() Background
-    GetFg() Foreground
+    GetBg() Color
+    GetFg() Color
 }
 
 
@@ -51,36 +51,36 @@ func LoadStyle(conf interface{}) (Style, error) {
 }
 
 type StyleUni struct {
-    fg Foreground
-    bg Background
+    fg Color
+    bg Color
 }
 
 func (s StyleUni) Format(str string, context Context, index int) string {
     return Colorize(str, Bg(s.bg), Fg(s.fg))
 }
 
-func (s StyleUni) GetBg() Background {
+func (s StyleUni) GetBg() Color {
     return s.bg
 }
 
-func (s StyleUni) GetFg() Foreground {
+func (s StyleUni) GetFg() Color {
     return s.fg
 }
 
-func NewStyleUni(fg Foreground, bg Background) Style {
+func NewStyleUni(fg Color, bg Color) Style {
     return &StyleUni{ fg, bg }
 }
 
 func LoadStyleUni(config map[string]interface{}) Style {
     var fg, _ = config["fg"].(string)
     var bg, _ = config["bg"].(string)
-    return &StyleUni{ StrToFg(fg), StrToBg(bg) }
+    return &StyleUni{ NewColor(fg), NewColor(bg) }
 }
 
 
 type StyleChameleon struct {
-    defaultFg Foreground
-    defaultBg Background
+    defaultFg Color
+    defaultBg Color
 }
 
 func (s StyleChameleon) Format(str string, context Context, index int) string {
@@ -89,13 +89,12 @@ func (s StyleChameleon) Format(str string, context Context, index int) string {
         next = index + 1
     }
 
-    fg := FgDefault
+    fg := NewColor("default")
     if prev != -1 {
-        tmp := context.Segments[prev].GetStyle(context, index).GetBg()
-        fg = BgToFg(tmp)
+        fg = context.Segments[prev].GetStyle(context, index).GetBg()
     }
 
-    bg := BgDefault
+    bg := NewColor("default")
     if next != -1 {
         bg = context.Segments[next].GetStyle(context, index).GetBg()
     }
@@ -103,20 +102,20 @@ func (s StyleChameleon) Format(str string, context Context, index int) string {
     return Colorize(str, Bg(bg), Fg(fg))
 }
 
-func (s StyleChameleon) GetBg() Background {
+func (s StyleChameleon) GetBg() Color {
     return s.defaultBg
 }
 
-func (s StyleChameleon) GetFg() Foreground {
+func (s StyleChameleon) GetFg() Color {
     return s.defaultFg
 }
 
 func NewStyleChameleon() Style {
-    return &StyleChameleon{ FgDefault, BgDefault }
+    return &StyleChameleon{ NewColor("default"), NewColor("default") }
 }
 
 func LoadStyleChameleon(config map[string]interface{}) Style {
     var fg, _ = config["default-fg"].(string)
     var bg, _ = config["default-bg"].(string)
-    return &StyleChameleon{ StrToFg(fg), StrToBg(bg) }
+    return &StyleChameleon{ NewColor(fg), NewColor(bg) }
 }

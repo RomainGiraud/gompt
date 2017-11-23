@@ -24,10 +24,10 @@ func main() {
         context.LoadConfig(byteValue)
     } else {
         context.Segments = []segments.Segment {
-            segments.NewUsername( segments.NewStyleUni(segments.FgRed, segments.BgGreen) ),
-            segments.NewSeparator( "\ue0b0 ", segments.NewStyleUni(segments.FgGreen, segments.BgRed) ),
-            segments.NewSeparator( "\ue0b0 ", segments.NewStyleUni(segments.FgRed, segments.BgYellow) ),
-            segments.NewSeparator( "\ue0b0 ", segments.NewStyleUni(segments.FgYellow, segments.BgBlack) ),
+            segments.NewUsername( segments.NewStyleUni(segments.NewColor("22"), segments.Green) ),
+            segments.NewSeparator( "\ue0b0", segments.NewStyleChameleon() ),
+            segments.NewPath( segments.NewStyleUni(segments.Blue, segments.NewColor("25")) ),
+            segments.NewSeparator( "\ue0b0", segments.NewStyleChameleon() ),
         }
     }
 
