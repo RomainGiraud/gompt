@@ -3,102 +3,104 @@ package segments
 import(
     "fmt"
     "bytes"
+    "strconv"
 )
 
 //fmt.Println(Colorize("toto", Bg24(0, 155, 0), Fg(30)))
 //fmt.Println(fmt.Sprintf(Color.Bg(46).Fg(30)("toto")))
 
-
 const escape = "\x1b"
 
-type Background int
-type Foreground int
-type Decorator int
+
+type Color interface {
+    Fprintf(buffer *bytes.Buffer, fg bool)
+}
+
+
+type Color4 struct {
+    value uint8
+}
+
+func (c Color4) Fprintf(buffer *bytes.Buffer, fg bool) {
+    if fg {
+        fmt.Fprintf(buffer, "%s[%dm", escape, 30 + c.value)
+    } else {
+        fmt.Fprintf(buffer, "%s[%dm", escape, 40 + c.value)
+    }
+}
+
+
+type Color8 struct {
+    value uint8
+}
+
+func (c Color8) Fprintf(buffer *bytes.Buffer, fg bool) {
+    if fg {
+        fmt.Fprintf(buffer, "%s[38;5;%dm", escape, c.value)
+    } else {
+        fmt.Fprintf(buffer, "%s[48;5;%dm", escape, c.value)
+    }
+}
+
+
+type Color24 struct {
+    r, g, b uint8
+}
+
+func (c Color24) Fprintf(buffer *bytes.Buffer, fg bool) {
+    if fg {
+        fmt.Fprintf(buffer, "%s[38;2;%d;%d;%dm", escape, c.r, c.g, c.b)
+    } else {
+        fmt.Fprintf(buffer, "%s[48;2;%d;%d;%dm", escape, c.r, c.g, c.b)
+    }
+}
+
+var Black    = Color4{ 0 }
+var Red      = Color4{ 1 }
+var Green    = Color4{ 2 }
+var Yellow   = Color4{ 3 }
+var Blue     = Color4{ 4 }
+var Magenta  = Color4{ 5 }
+var Cyan     = Color4{ 6 }
+var White    = Color4{ 7 }
+var Default  = Color4{ 9 }
+
+func NewColor(str string) Color {
+    if i, err := strconv.Atoi(str); err == nil {
+        return Color8{ uint8(i) }
+    }
+
+    if str[0] == '#' {
+        var r, g, b uint64
+        if len(str) == 4 {
+            r, _ = strconv.ParseUint(str[1:2], 16, 8)
+            g, _ = strconv.ParseUint(str[2:3], 16, 8)
+            b, _ = strconv.ParseUint(str[3:4], 16, 8)
+        } else if len(str) == 7 {
+            r, _ = strconv.ParseUint(str[1:3], 16, 8)
+            g, _ = strconv.ParseUint(str[3:5], 16, 8)
+            b, _ = strconv.ParseUint(str[5:7], 16, 8)
+        }
+        return Color24{ uint8(r), uint8(g), uint8(b) }
+    }
+
+    switch str {
+    case "black"    : return Color4{ 0 }
+    case "red"      : return Color4{ 1 }
+    case "green"    : return Color4{ 2 }
+    case "yellow"   : return Color4{ 3 }
+    case "blue"     : return Color4{ 4 }
+    case "magenta"  : return Color4{ 5 }
+    case "cyan"     : return Color4{ 6 }
+    case "white"    : return Color4{ 7 }
+    case "default"  : return Color4{ 9 }
+    }
+
+    panic("cannot parse color");
+}
+
+
 type Attribute func(*bytes.Buffer) error
-
-const(
-    FgBlack     Foreground = 30
-    FgRed       Foreground = 31
-    FgGreen     Foreground = 32
-    FgYellow    Foreground = 33
-    FgBlue      Foreground = 34
-    FgMagenta   Foreground = 35
-    FgCyan      Foreground = 36
-    FgWhite     Foreground = 37
-    FgDefault   Foreground = 39
-)
-
-const(
-    BgBlack     Background = 40
-    BgRed       Background = 41
-    BgGreen     Background = 42
-    BgYellow    Background = 43
-    BgBlue      Background = 44
-    BgMagenta   Background = 45
-    BgCyan      Background = 46
-    BgWhite     Background = 47
-    BgDefault   Background = 49
-)
-
-func StrToFg(str string) Foreground {
-    switch str {
-    case "black"    : return FgBlack
-    case "red"      : return FgRed
-    case "green"    : return FgGreen
-    case "yellow"   : return FgYellow
-    case "blue"     : return FgBlue
-    case "magenta"  : return FgMagenta
-    case "cyan"     : return FgCyan
-    case "white"    : return FgWhite
-    case "default"  : return FgDefault
-    default         : return FgBlack
-    }
-}
-
-func StrToBg(str string) Background {
-    switch str {
-    case "black"    : return BgBlack
-    case "red"      : return BgRed
-    case "green"    : return BgGreen
-    case "yellow"   : return BgYellow
-    case "blue"     : return BgBlue
-    case "magenta"  : return BgMagenta
-    case "cyan"     : return BgCyan
-    case "white"    : return BgWhite
-    case "default"  : return BgDefault
-    default         : return BgBlack
-    }
-}
-
-func FgToBg(fg Foreground) Background {
-    switch fg {
-    case FgBlack    : return BgBlack
-    case FgRed      : return BgRed
-    case FgGreen    : return BgGreen
-    case FgYellow   : return BgYellow
-    case FgBlue     : return BgBlue
-    case FgMagenta  : return BgMagenta
-    case FgCyan     : return BgCyan
-    case FgWhite    : return BgWhite
-    case FgDefault  : return BgDefault
-    default         : return BgDefault
-    }
-}
-
-func BgToFg(bg Background) Foreground {
-    switch bg {
-    case BgBlack    : return FgBlack
-    case BgRed      : return FgRed
-    case BgGreen    : return FgGreen
-    case BgYellow   : return FgYellow
-    case BgBlue     : return FgBlue
-    case BgMagenta  : return FgMagenta
-    case BgCyan     : return FgCyan
-    case BgWhite    : return FgWhite
-    case BgDefault  : return FgDefault
-    default         : return FgDefault
-    }
-}
 
 func Colorize(str string, styles ...Attribute) string {
     return ColorizeFn(styles...)(str)
@@ -119,44 +121,16 @@ func ColorizeFn(styles ...Attribute) func(str string) string {
     }
 }
 
-func Bg(bg Background) Attribute {
+func Bg(c Color) Attribute {
     return func(buffer *bytes.Buffer) error {
-        fmt.Fprintf(buffer, "%s[%dm", escape, bg)
+        c.Fprintf(buffer, false)
         return nil
     }
 }
 
-func Bg8(bg int) Attribute {
+func Fg(c Color) Attribute {
     return func(buffer *bytes.Buffer) error {
-        fmt.Fprintf(buffer, "%s[48;5;%dm", escape, bg)
-        return nil
-    }
-}
-
-func Bg24(r int, g int, b int) Attribute {
-    return func(buffer *bytes.Buffer) error {
-        fmt.Fprintf(buffer, "%s[48;2;%d;%d;%dm", escape, r, g, b)
-        return nil
-    }
-}
-
-func Fg(fg Foreground) Attribute {
-    return func(buffer *bytes.Buffer) error {
-        fmt.Fprintf(buffer, "%s[%dm", escape, fg)
-        return nil
-    }
-}
-
-func Fg8(fg int) Attribute {
-    return func(buffer *bytes.Buffer) error {
-        fmt.Fprintf(buffer, "%s[38;5;%dm", escape, fg)
-        return nil
-    }
-}
-
-func Fg24(r int, g int, b int) Attribute {
-    return func(buffer *bytes.Buffer) error {
-        fmt.Fprintf(buffer, "%s[38;2;%d;%d;%dm", escape, r, g, b)
+        c.Fprintf(buffer, true)
         return nil
     }
 }

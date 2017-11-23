@@ -4,8 +4,8 @@
           "text": "toto",
           "style": {
               "type": "uni",
-              "fg": "blue",
-              "bg": "white"
+              "fg": "43",
+              "bg": "#0000ff"
           }
         },
         { "type": "separator",
