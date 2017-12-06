@@ -1,7 +1,6 @@
 package segments
 
 import(
-    "fmt"
 )
 
 
@@ -14,9 +13,9 @@ type ExitStatus struct {
 
 func (e ExitStatus) Print(context Context, index int) {
     if context.Args.Status == 0 {
-        fmt.Print(e.styleSuccess.Format(e.textSuccess, context, index, 0))
+        FormatString(e.textSuccess, e.styleSuccess, context, index)
     } else {
-        fmt.Print(e.styleError.Format(e.textError, context, index, 0))
+        FormatString(e.textError, e.styleError, context, index)
     }
 }
 

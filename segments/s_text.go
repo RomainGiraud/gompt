@@ -1,7 +1,6 @@
 package segments
 
 import(
-    "fmt"
     "os"
 )
 
@@ -12,7 +11,7 @@ type Text struct {
 }
 
 func (t Text) Print(context Context, index int) {
-    fmt.Print(t.style.Format(os.ExpandEnv(t.value), context, index, 0))
+    FormatString(os.ExpandEnv(t.value), t.style, context, index)
 }
 
 func (t Text) GetStyle(context Context, index int) Style {

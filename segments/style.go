@@ -1,7 +1,7 @@
 package segments
 
 import(
-    _ "fmt"
+    "fmt"
     _ "log"
     "errors"
     _ "strconv"
@@ -13,6 +13,21 @@ type Style interface {
     Format(string, Context, int, float32) string
     GetBg() Color
     GetFg() Color
+}
+
+func FormatString(str string, style Style, context Context, index int) {
+    size := float32(len(str))
+    for i, s := range str {
+        fmt.Print(style.Format(string(s), context, index, float32(i) / size))
+    }
+}
+
+func FormatStringArray(strs []string, separator string, style Style, context Context, index int) {
+    size := float32(len(strs))
+    for i, s := range strs {
+        fmt.Print(style.Format(s, context, index, float32(i) / size))
+        fmt.Print(separator)
+    }
 }
 
 
