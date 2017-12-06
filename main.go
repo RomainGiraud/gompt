@@ -26,7 +26,7 @@ func main() {
         context.Segments = []segments.Segment {
             segments.NewUsername( segments.NewStyleUni(segments.NewColor("22"), segments.Green) ),
             segments.NewSeparator( "\ue0b0", segments.NewStyleChameleon() ),
-            segments.NewPath( segments.NewStyleUni(segments.Blue, segments.NewColor("25")) ),
+            segments.NewComplexPath( segments.NewStyleGradient(segments.NewColor("23"), segments.NewColor("25"), segments.NewColor("41"), segments.NewColor("45")), "" ),
             segments.NewSeparator( "\ue0b0", segments.NewStyleChameleon() ),
         }
     }
