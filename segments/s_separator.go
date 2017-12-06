@@ -1,7 +1,6 @@
 package segments
 
 import(
-    "fmt"
     _"log"
     _"encoding/json"
 )
@@ -13,7 +12,7 @@ type Separator struct {
 }
 
 func (s Separator) Print(context Context, index int) {
-    fmt.Print(s.style.Format(s.value, context, index, 0))
+    FormatString(s.value, s.style, context, index)
 }
 
 func (s Separator) GetStyle(context Context, index int) Style {

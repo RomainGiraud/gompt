@@ -1,7 +1,6 @@
 package segments
 
 import(
-    "fmt"
     "os"
     "log"
 )
@@ -16,7 +15,7 @@ func (p Path) Print(context Context, index int) {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Print(p.style.Format(dir, context, index, 0))
+    FormatString(dir, p.style, context, index)
 }
 
 func (p Path) GetStyle(context Context, index int) Style {
