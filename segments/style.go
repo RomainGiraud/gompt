@@ -34,6 +34,7 @@ func FormatStringArray(strs []string, separator string, style Style, context Con
 func init() {
     RegisterStyleLoader("uni", LoadStyleUni)
     RegisterStyleLoader("cham", LoadStyleChameleon)
+    RegisterStyleLoader("gradient", LoadStyleGradient)
 }
 
 type StyleLoader func(map[string]interface{}) Style
@@ -133,4 +134,36 @@ func LoadStyleChameleon(config map[string]interface{}) Style {
     var fg, _ = config["default-fg"].(string)
     var bg, _ = config["default-bg"].(string)
     return &StyleChameleon{ NewColor(fg), NewColor(bg) }
+}
+
+
+type StyleGradient struct {
+    fgStart Color
+    fgEnd   Color
+    bgStart Color
+    bgEnd   Color
+}
+
+func (s StyleGradient) Format(str string, context Context, index int, t float32) string {
+    return Colorize(str, Bg(s.bgStart.Lerp(s.bgEnd, t)), Fg(s.fgStart.Lerp(s.fgEnd, t)))
+}
+
+func (s StyleGradient) GetBg() Color {
+    return s.bgStart
+}
+
+func (s StyleGradient) GetFg() Color {
+    return s.fgEnd
+}
+
+func NewStyleGradient(fgStart Color, fgEnd Color, bgStart Color, bgEnd Color) Style {
+    return &StyleGradient{ fgStart, fgEnd, bgStart, bgEnd }
+}
+
+func LoadStyleGradient(config map[string]interface{}) Style {
+    var fgStart, _ = config["fg-start"].(string)
+    var fgEnd  , _ = config["fg-end"].(string)
+    var bgStart, _ = config["bg-start"].(string)
+    var bgEnd  , _ = config["bg-end"].(string)
+    return &StyleGradient{ NewColor(fgStart), NewColor(fgEnd), NewColor(bgStart), NewColor(bgEnd) }
 }
