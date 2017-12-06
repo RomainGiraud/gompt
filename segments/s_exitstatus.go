@@ -14,9 +14,9 @@ type ExitStatus struct {
 
 func (e ExitStatus) Print(context Context, index int) {
     if context.Args.Status == 0 {
-        fmt.Print(e.styleSuccess.Format(e.textSuccess, context, index))
+        fmt.Print(e.styleSuccess.Format(e.textSuccess, context, index, 0))
     } else {
-        fmt.Print(e.styleError.Format(e.textError, context, index))
+        fmt.Print(e.styleError.Format(e.textError, context, index, 0))
     }
 }
 

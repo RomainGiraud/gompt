@@ -13,7 +13,7 @@ type Separator struct {
 }
 
 func (s Separator) Print(context Context, index int) {
-    fmt.Print(s.style.Format(s.value, context, index))
+    fmt.Print(s.style.Format(s.value, context, index, 0))
 }
 
 func (s Separator) GetStyle(context Context, index int) Style {

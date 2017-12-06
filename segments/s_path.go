@@ -16,7 +16,7 @@ func (p Path) Print(context Context, index int) {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Print(p.style.Format(dir, context, index))
+    fmt.Print(p.style.Format(dir, context, index, 0))
 }
 
 func (p Path) GetStyle(context Context, index int) Style {

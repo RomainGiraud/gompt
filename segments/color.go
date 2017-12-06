@@ -14,6 +14,7 @@ const escape = "\x1b"
 
 type Color interface {
     Fprintf(buffer *bytes.Buffer, fg bool)
+    Lerp(Color, float32) Color
 }
 
 
@@ -29,7 +30,16 @@ func (c Color4) Fprintf(buffer *bytes.Buffer, fg bool) {
     }
 }
 
+func (c Color4) Lerp(other Color, t float32) Color  {
+    switch o := other.(type) {
+    case Color4:
+        return Color4{ c.value + uint8(t * float32(o.value - c.value)) }
+    default:
+        return c
+    }
+}
 
+ 
 type Color8 struct {
     value uint8
 }
@@ -39,6 +49,15 @@ func (c Color8) Fprintf(buffer *bytes.Buffer, fg bool) {
         fmt.Fprintf(buffer, "%s[38;5;%dm", escape, c.value)
     } else {
         fmt.Fprintf(buffer, "%s[48;5;%dm", escape, c.value)
+    }
+}
+
+func (c Color8) Lerp(other Color, t float32) Color {
+    switch o := other.(type) {
+    case Color8:
+        return Color8{ c.value + uint8(t * float32(o.value - c.value)) }
+    default:
+        return c
     }
 }
 
@@ -54,6 +73,20 @@ func (c Color24) Fprintf(buffer *bytes.Buffer, fg bool) {
         fmt.Fprintf(buffer, "%s[48;2;%d;%d;%dm", escape, c.r, c.g, c.b)
     }
 }
+
+func (c Color24) Lerp(other Color, t float32) Color {
+    switch o := other.(type) {
+    case Color24:
+        return Color24{
+            c.r + uint8(t * float32(o.r - c.r)),
+            c.g + uint8(t * float32(o.g - c.g)),
+            c.b + uint8(t * float32(o.b - c.b)),
+        }
+    default:
+        return c
+    }
+}
+
 
 var Black    = Color4{ 0 }
 var Red      = Color4{ 1 }

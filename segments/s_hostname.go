@@ -12,7 +12,7 @@ type Hostname struct {
 
 func (h Hostname) Print(context Context, index int) {
     n, _ := os.Hostname()
-    fmt.Print(h.style.Format(n, context, index))
+    fmt.Print(h.style.Format(n, context, index, 0))
 }
 
 func (h Hostname) GetStyle(context Context, index int) Style {

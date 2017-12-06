@@ -12,7 +12,7 @@ type Text struct {
 }
 
 func (t Text) Print(context Context, index int) {
-    fmt.Print(t.style.Format(os.ExpandEnv(t.value), context, index))
+    fmt.Print(t.style.Format(os.ExpandEnv(t.value), context, index, 0))
 }
 
 func (t Text) GetStyle(context Context, index int) Style {
