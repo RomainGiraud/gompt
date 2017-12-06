@@ -12,7 +12,7 @@ type Username struct {
 
 func (u Username) Print(context Context, index int) {
     uc, _ := user.Current()
-    fmt.Print(u.style.Format(uc.Username, context, index))
+    fmt.Print(u.style.Format(uc.Username, context, index, 0))
 }
 
 func (u Username) GetStyle(context Context, index int) Style {

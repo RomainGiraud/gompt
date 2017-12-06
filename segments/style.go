@@ -10,7 +10,7 @@ import(
 
 
 type Style interface {
-    Format(string, Context, int) string
+    Format(string, Context, int, float32) string
     GetBg() Color
     GetFg() Color
 }
@@ -55,7 +55,7 @@ type StyleUni struct {
     bg Color
 }
 
-func (s StyleUni) Format(str string, context Context, index int) string {
+func (s StyleUni) Format(str string, context Context, index int, t float32) string {
     return Colorize(str, Bg(s.bg), Fg(s.fg))
 }
 
@@ -83,7 +83,7 @@ type StyleChameleon struct {
     defaultBg Color
 }
 
-func (s StyleChameleon) Format(str string, context Context, index int) string {
+func (s StyleChameleon) Format(str string, context Context, index int, t float32) string {
     prev, next := index - 1, -1
     if index + 1 < len(context.Segments) {
         next = index + 1
