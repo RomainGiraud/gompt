@@ -38,6 +38,16 @@
               "default-bg": "blue"
           }
         },
+        { "type": "username",
+          "style": {
+              "type": "gradient",
+              "fg-start": "23",
+              "fg-end": "26",
+              "bg-start": "43",
+              "bg-end": "46",
+              "bg": "#0000ff"
+          }
+        },
         { "type": "separator",
           "text": "\ue0b0",
           "style": {
