@@ -10,15 +10,15 @@ type Path struct {
     style Style
 }
 
-func (p Path) Print(context Context, index int) {
+func (p Path) Print(segments []Segment, current int) {
     dir, err := os.Getwd()
     if err != nil {
         log.Fatal(err)
     }
-    FormatString(dir, p.style, context, index)
+    FormatString(dir, p.style, segments, current)
 }
 
-func (p Path) GetStyle(context Context, index int) Style {
+func (p Path) GetStyle(segments []Segment, current int) Style {
     return p.style
 }
 

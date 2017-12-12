@@ -9,12 +9,12 @@ type Username struct {
     style Style
 }
 
-func (u Username) Print(context Context, index int) {
+func (u Username) Print(segments []Segment, current int) {
     uc, _ := user.Current()
-    FormatString(uc.Username, u.style, context, index)
+    FormatString(uc.Username, u.style, segments, current)
 }
 
-func (u Username) GetStyle(context Context, index int) Style {
+func (u Username) GetStyle(segments []Segment, current int) Style {
     return u.style
 }
 

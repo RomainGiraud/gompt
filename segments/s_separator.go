@@ -11,11 +11,11 @@ type Separator struct {
     value string
 }
 
-func (s Separator) Print(context Context, index int) {
-    FormatString(s.value, s.style, context, index)
+func (s Separator) Print(segments []Segment, current int) {
+    FormatString(s.value, s.style, segments, current)
 }
 
-func (s Separator) GetStyle(context Context, index int) Style {
+func (s Separator) GetStyle(segments []Segment, current int) Style {
     return s.style
 }
 
