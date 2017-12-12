@@ -24,10 +24,17 @@ func main() {
         context.LoadConfig(byteValue)
     } else {
         context.Segments = []segments.Segment {
-            segments.NewUsername( segments.NewStyleUni(segments.NewColor("22"), segments.Green) ),
-            segments.NewSeparator( "\ue0b0", segments.NewStyleChameleon() ),
-            segments.NewComplexPath( segments.NewStyleGradient(segments.NewColor("23"), segments.NewColor("25"), segments.NewColor("41"), segments.NewColor("45")), "", segments.Red ),
-            segments.NewSeparator( "\ue0b0", segments.NewStyleChameleon() ),
+            segments.NewUsername( segments.StyleStandard{ segments.UniBrush{ segments.Green }, segments.UniBrush{ segments.NewColor("#555") } } ),
+            segments.NewSeparator( "\u2588\u2588\u2588\u2588\ue0b0        ", segments.StyleChameleon{ } ),
+            segments.NewText( segments.StyleStandard{ segments.UniBrush{ segments.NewColor("#0000ff") }, segments.UniBrush{ segments.NewColor("#fff") } }, "${cmd> ls -la | wc -l}@" ),
+            segments.NewHostname( segments.StyleStandard{ segments.UniBrush{ segments.NewColor("#0000f0") }, segments.GradientBrush{ segments.NewColor("#fff"), segments.NewColor("#aaa") } } ),
+            segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
+            segments.NewComplexPath(
+                segments.StyleStandard{
+                    segments.UniBrush{ segments.NewColor("#555") },
+                    segments.GradientBrush{ segments.NewColor("#0000ff"), segments.NewColor("#ff0000") } },
+                "\ue0b1", segments.Red ),
+            segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
         }
     }
 
