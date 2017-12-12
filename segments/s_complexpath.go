@@ -10,7 +10,7 @@ import(
 type ComplexPath struct {
     style Style
     separator string
-    fgSeparator Color
+    fgSeparator Brush
 }
 
 func (p ComplexPath) Print(segments []Segment, current int) {
@@ -24,22 +24,22 @@ func (p ComplexPath) Print(segments []Segment, current int) {
     }
     dir_s := strings.Split(dir, "/")
 
-    FormatStringArray(dir_s, p.separator, p.style, segments, current)
+    FormatStringArray(dir_s, p.style, p.separator, p.fgSeparator, segments, current)
 }
 
 func (p ComplexPath) GetStyle(segments []Segment, current int) Style {
     return p.style
 }
 
-func NewComplexPath(style Style, separator string, fgSeparator Color) Segment {
+func NewComplexPath(style Style, separator string, fgSeparator Brush) Segment {
     return &ComplexPath{ style, separator, fgSeparator }
 }
 
 func LoadComplexPath(config map[string]interface{}) Segment {
-    var style, _ = LoadStyle(config["style"])
-    var sep, _  = config["separator"].(string);
-    var fg_sep, _  = config["fg-separator"].(string);
-    return &ComplexPath{ style, sep, NewColor(fg_sep) }
+    //var style, _ = LoadStyle(config["style"])
+    //var sep, _  = config["separator"].(string);
+    //var fg_sep, _  = config["fg-separator"].(string);
+    return &ComplexPath{ }
 }
 
 func init() {

@@ -33,7 +33,8 @@ func main() {
                 segments.StyleStandard{
                     segments.UniBrush{ segments.NewColor("#555") },
                     segments.GradientBrush{ segments.NewColor("#0000ff"), segments.NewColor("#ff0000") } },
-                "\ue0b1", segments.Red ),
+                "\ue0b1",
+                segments.UniBrush{ segments.Red } ),
             segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
         }
     }
