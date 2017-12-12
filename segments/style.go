@@ -10,8 +10,9 @@ import(
 
 type Style interface {
     Format(string, float32, Style, Style) string
-    GetBg() Color
-    GetFg() Color
+    GetBg() Brush
+    GetFg() Brush
+    Override(Brush, Brush) Style
 }
 
 func FormatString(str string, style Style, segments []Segment, current int) {
@@ -39,15 +40,14 @@ func FormatStringArray(strs []string, separator string, style Style, segments []
             nextStyle = segments[current + 1].GetStyle(segments, current + 1)
         }
         fmt.Print(style.Format(s, float32(i) / size, prevStyle, nextStyle))
-        fmt.Print(style.Format(separator, float32(i) / size, prevStyle, nextStyle))
+        fmt.Print(style.Override(UniBrush{ Red }, nil).Format(separator, float32(i) / size, prevStyle, nextStyle))
     }
 }
 
 
 func init() {
-    RegisterStyleLoader("uni", LoadStyleUni)
+    RegisterStyleLoader("standard", LoadStyleStandard)
     RegisterStyleLoader("cham", LoadStyleChameleon)
-    RegisterStyleLoader("gradient", LoadStyleGradient)
 }
 
 type StyleLoader func(map[string]interface{}) Style
@@ -78,99 +78,80 @@ func LoadStyle(conf interface{}) (Style, error) {
     return val(config), nil
 }
 
-type StyleUni struct {
-    fg Color
-    bg Color
+
+type StyleStandard struct {
+    Fg Brush
+    Bg Brush
 }
 
-func (s StyleUni) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
-    return Colorize(str, Bg(s.bg), Fg(s.fg))
+func (s StyleStandard) GetBg() Brush {
+    return s.Bg
 }
 
-func (s StyleUni) GetBg() Color {
-    return s.bg
+func (s StyleStandard) GetFg() Brush {
+    return s.Fg
 }
 
-func (s StyleUni) GetFg() Color {
-    return s.fg
+func (s StyleStandard) Override(fg Brush, bg Brush) Style {
+    var newStyle StyleStandard = s
+    if fg != nil {
+        newStyle.Fg = fg
+    }
+    if bg != nil {
+        newStyle.Bg = bg
+    }
+    return newStyle
 }
 
-func NewStyleUni(fg Color, bg Color) Style {
-    return &StyleUni{ fg, bg }
+func (s StyleStandard) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
+    return Colorize(str, Bg(s.Bg.ValueAt(t)), Fg(s.Fg.ValueAt(t)))
 }
 
-func LoadStyleUni(config map[string]interface{}) Style {
+func LoadStyleStandard(config map[string]interface{}) Style {
+    /*
     var fg, _ = config["fg"].(string)
     var bg, _ = config["bg"].(string)
-    return &StyleUni{ NewColor(fg), NewColor(bg) }
+    return &StyleStandard{ NewColor(fg), NewColor(bg) }
+    */
+    return &StyleStandard{}
 }
 
 
 type StyleChameleon struct {
-    defaultFg Color
-    defaultBg Color
+}
+
+func (s StyleChameleon) GetBg() Brush {
+    return nil
+}
+
+func (s StyleChameleon) GetFg() Brush {
+    return nil
+}
+
+func (s StyleChameleon) Override(fg Brush, bg Brush) Style {
+    return s
 }
 
 func (s StyleChameleon) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
     fg := NewColor("default")
     if prevStyle != nil {
-        fg = prevStyle.GetBg()
+        if style := prevStyle.GetBg(); style != nil {
+            fg = style.ValueAt(1)
+        }
     }
 
     bg := NewColor("default")
     if nextStyle != nil {
-        bg = prevStyle.GetBg()
+        if style := nextStyle.GetBg(); style != nil {
+            bg = style.ValueAt(0)
+        }
     }
 
     return Colorize(str, Bg(bg), Fg(fg))
 }
 
-func (s StyleChameleon) GetBg() Color {
-    return s.defaultBg
-}
-
-func (s StyleChameleon) GetFg() Color {
-    return s.defaultFg
-}
-
-func NewStyleChameleon() Style {
-    return &StyleChameleon{ NewColor("default"), NewColor("default") }
-}
-
 func LoadStyleChameleon(config map[string]interface{}) Style {
-    var fg, _ = config["default-fg"].(string)
-    var bg, _ = config["default-bg"].(string)
-    return &StyleChameleon{ NewColor(fg), NewColor(bg) }
-}
-
-
-type StyleGradient struct {
-    fgStart Color
-    fgEnd   Color
-    bgStart Color
-    bgEnd   Color
-}
-
-func (s StyleGradient) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
-    return Colorize(str, Bg(s.bgStart.Lerp(s.bgEnd, t)), Fg(s.fgStart.Lerp(s.fgEnd, t)))
-}
-
-func (s StyleGradient) GetBg() Color {
-    return s.bgStart
-}
-
-func (s StyleGradient) GetFg() Color {
-    return s.fgEnd
-}
-
-func NewStyleGradient(fgStart Color, fgEnd Color, bgStart Color, bgEnd Color) Style {
-    return &StyleGradient{ fgStart, fgEnd, bgStart, bgEnd }
-}
-
-func LoadStyleGradient(config map[string]interface{}) Style {
-    var fgStart, _ = config["fg-start"].(string)
-    var fgEnd  , _ = config["fg-end"].(string)
-    var bgStart, _ = config["bg-start"].(string)
-    var bgEnd  , _ = config["bg-end"].(string)
-    return &StyleGradient{ NewColor(fgStart), NewColor(fgEnd), NewColor(bgStart), NewColor(bgEnd) }
+    //var fg, _ = config["fg-default"].(string)
+    //var bg, _ = config["bg-default"].(string)
+    return &StyleChameleon{ }
 }
