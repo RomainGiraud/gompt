@@ -1,7 +1,7 @@
 package segments
 
 import(
-    "fmt"
+    "io"
 )
 
 
@@ -11,20 +11,19 @@ type Arguments struct {
 }
 
 type Segment interface {
-    Print([]Segment, int)
+    Print(io.Writer, []Segment, int)
     GetStyle([]Segment, int) Style
 }
 
 type SegmentList []Segment
 
-func (segments *SegmentList) Display() {
+func (segments *SegmentList) Display(writer io.Writer) {
     if len(*segments) == 0 {
         panic("Empty prompt")
     }
 
     for i, j := 0, 1; i < len(*segments); i, j = i+1, j+1 {
         seg := (*segments)[i]
-        seg.Print(*segments, i)
+        seg.Print(writer, *segments, i)
     }
-    fmt.Printf("\n")
 }

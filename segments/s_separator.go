@@ -1,8 +1,7 @@
 package segments
 
 import(
-    _"log"
-    _"encoding/json"
+    "io"
 )
 
 
@@ -11,8 +10,8 @@ type Separator struct {
     value string
 }
 
-func (s Separator) Print(segments []Segment, current int) {
-    FormatString(s.value, s.style, segments, current)
+func (s Separator) Print(writer io.Writer, segments []Segment, current int) {
+    FormatString(writer, s.value, s.style, segments, current)
 }
 
 func (s Separator) GetStyle(segments []Segment, current int) Style {

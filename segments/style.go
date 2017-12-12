@@ -1,11 +1,11 @@
 package segments
 
 import(
-    "fmt"
+    "io"
 )
 
 
-func FormatString(str string, style Style, segments []Segment, current int) {
+func FormatString(writer io.Writer, str string, style Style, segments []Segment, current int) {
     size := float32(len(str))
     for i, s := range str {
         var prevStyle, nextStyle Style = nil, nil
@@ -15,11 +15,11 @@ func FormatString(str string, style Style, segments []Segment, current int) {
         if (current + 1) < len(segments) {
             nextStyle = segments[current + 1].GetStyle(segments, current + 1)
         }
-        fmt.Print(style.Format(string(s), float32(i) / size, prevStyle, nextStyle))
+        style.Format(writer, string(s), float32(i) / size, prevStyle, nextStyle)
     }
 }
 
-func FormatStringArray(strs []string, style Style, separator string, separatorStyle Brush, segments []Segment, current int) {
+func FormatStringArray(writer io.Writer, strs []string, style Style, separator string, separatorStyle Brush, segments []Segment, current int) {
     size := float32(len(strs))
     for i, s := range strs {
         var prevStyle, nextStyle Style = nil, nil
@@ -29,14 +29,14 @@ func FormatStringArray(strs []string, style Style, separator string, separatorSt
         if (current + 1) < len(segments) {
             nextStyle = segments[current + 1].GetStyle(segments, current + 1)
         }
-        fmt.Print(style.Format(s, float32(i) / size, prevStyle, nextStyle))
-        fmt.Print(style.Override(separatorStyle, nil).Format(separator, float32(i) / size, prevStyle, nextStyle))
+        style.Format(writer, s, float32(i) / size, prevStyle, nextStyle)
+        style.Override(separatorStyle, nil).Format(writer, separator, float32(i) / size, prevStyle, nextStyle)
     }
 }
 
 
 type Style interface {
-    Format(string, float32, Style, Style) string
+    Format(io.Writer, string, float32, Style, Style)
     GetBg() Brush
     GetFg() Brush
     Override(Brush, Brush) Style
@@ -67,8 +67,8 @@ func (s StyleStandard) Override(fg Brush, bg Brush) Style {
     return newStyle
 }
 
-func (s StyleStandard) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
-    return Colorize(str, Bg(s.Bg.ValueAt(t)), Fg(s.Fg.ValueAt(t)))
+func (s StyleStandard) Format(writer io.Writer, str string, t float32, prevStyle Style, nextStyle Style) {
+    Colorize(writer, str, Bg(s.Bg.ValueAt(t)), Fg(s.Fg.ValueAt(t)))
 }
 
 
@@ -87,7 +87,7 @@ func (s StyleChameleon) Override(fg Brush, bg Brush) Style {
     return s
 }
 
-func (s StyleChameleon) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
+func (s StyleChameleon) Format(writer io.Writer, str string, t float32, prevStyle Style, nextStyle Style) {
     fg := NewColor("default")
     if prevStyle != nil {
         if style := prevStyle.GetBg(); style != nil {
@@ -102,5 +102,5 @@ func (s StyleChameleon) Format(str string, t float32, prevStyle Style, nextStyle
         }
     }
 
-    return Colorize(str, Bg(bg), Fg(fg))
+    Colorize(writer, str, Bg(bg), Fg(fg))
 }

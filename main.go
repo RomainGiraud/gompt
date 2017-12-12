@@ -1,6 +1,8 @@
 package main
 
 import(
+    "fmt"
+    "bytes"
     "flag"
     "github.com/RomainGiraud/gompt/segments"
 )
@@ -17,13 +19,13 @@ func main() {
             segments.StyleStandard{
                 segments.UniBrush{ segments.NewColor("#555") },
                 segments.UniBrush{ segments.NewColor("#555") } },
-            "\ue0b0" )
+            "\uf444" )
     } else {
         exitStatus = segments.NewText(
             segments.StyleStandard{
                 segments.UniBrush{ segments.NewColor("#f00") },
                 segments.UniBrush{ segments.NewColor("#555") } },
-            "\ue0b0" )
+            "\uf444" )
     }
 
     segmentList := segments.SegmentList {
@@ -42,5 +44,7 @@ func main() {
         segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
     }
 
-    segmentList.Display()
+    var buffer bytes.Buffer
+    segmentList.Display(&buffer)
+    fmt.Println(buffer.String())
 }
