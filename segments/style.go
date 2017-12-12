@@ -29,7 +29,7 @@ func FormatString(str string, style Style, segments []Segment, current int) {
     }
 }
 
-func FormatStringArray(strs []string, separator string, style Style, segments []Segment, current int) {
+func FormatStringArray(strs []string, style Style, separator string, separatorStyle Brush, segments []Segment, current int) {
     size := float32(len(strs))
     for i, s := range strs {
         var prevStyle, nextStyle Style = nil, nil
@@ -40,7 +40,7 @@ func FormatStringArray(strs []string, separator string, style Style, segments []
             nextStyle = segments[current + 1].GetStyle(segments, current + 1)
         }
         fmt.Print(style.Format(s, float32(i) / size, prevStyle, nextStyle))
-        fmt.Print(style.Override(UniBrush{ Red }, nil).Format(separator, float32(i) / size, prevStyle, nextStyle))
+        fmt.Print(style.Override(separatorStyle, nil).Format(separator, float32(i) / size, prevStyle, nextStyle))
     }
 }
 
