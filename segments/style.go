@@ -8,25 +8,38 @@ import(
     _ "encoding/json"
 )
 
-
 type Style interface {
-    Format(string, Context, int, float32) string
+    Format(string, float32, Style, Style) string
     GetBg() Color
     GetFg() Color
 }
 
-func FormatString(str string, style Style, context Context, index int) {
+func FormatString(str string, style Style, segments []Segment, current int) {
     size := float32(len(str))
     for i, s := range str {
-        fmt.Print(style.Format(string(s), context, index, float32(i) / size))
+        var prevStyle, nextStyle Style = nil, nil
+        if current != 0 {
+            prevStyle = segments[current - 1].GetStyle(segments, current - 1)
+        }
+        if (current + 1) < len(segments) {
+            nextStyle = segments[current + 1].GetStyle(segments, current + 1)
+        }
+        fmt.Print(style.Format(string(s), float32(i) / size, prevStyle, nextStyle))
     }
 }
 
-func FormatStringArray(strs []string, separator string, style Style, context Context, index int) {
+func FormatStringArray(strs []string, separator string, style Style, segments []Segment, current int) {
     size := float32(len(strs))
     for i, s := range strs {
-        fmt.Print(style.Format(s, context, index, float32(i) / size))
-        fmt.Print(separator)
+        var prevStyle, nextStyle Style = nil, nil
+        if current != 0 {
+            prevStyle = segments[current - 1].GetStyle(segments, current - 1)
+        }
+        if (current + 1) < len(segments) {
+            nextStyle = segments[current + 1].GetStyle(segments, current + 1)
+        }
+        fmt.Print(style.Format(s, float32(i) / size, prevStyle, nextStyle))
+        fmt.Print(style.Format(separator, float32(i) / size, prevStyle, nextStyle))
     }
 }
 
@@ -44,7 +57,6 @@ var styleLoaders = map[string]StyleLoader{}
 func RegisterStyleLoader(name string, fn StyleLoader) {
     styleLoaders[name] = fn
 }
-
 
 func LoadStyle(conf interface{}) (Style, error) {
     config, ok := conf.(map[string]interface{})
@@ -71,7 +83,7 @@ type StyleUni struct {
     bg Color
 }
 
-func (s StyleUni) Format(str string, context Context, index int, t float32) string {
+func (s StyleUni) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
     return Colorize(str, Bg(s.bg), Fg(s.fg))
 }
 
@@ -99,20 +111,15 @@ type StyleChameleon struct {
     defaultBg Color
 }
 
-func (s StyleChameleon) Format(str string, context Context, index int, t float32) string {
-    prev, next := index - 1, -1
-    if index + 1 < len(context.Segments) {
-        next = index + 1
-    }
-
+func (s StyleChameleon) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
     fg := NewColor("default")
-    if prev != -1 {
-        fg = context.Segments[prev].GetStyle(context, index).GetBg()
+    if prevStyle != nil {
+        fg = prevStyle.GetBg()
     }
 
     bg := NewColor("default")
-    if next != -1 {
-        bg = context.Segments[next].GetStyle(context, index).GetBg()
+    if nextStyle != nil {
+        bg = prevStyle.GetBg()
     }
 
     return Colorize(str, Bg(bg), Fg(fg))
@@ -144,7 +151,7 @@ type StyleGradient struct {
     bgEnd   Color
 }
 
-func (s StyleGradient) Format(str string, context Context, index int, t float32) string {
+func (s StyleGradient) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
     return Colorize(str, Bg(s.bgStart.Lerp(s.bgEnd, t)), Fg(s.fgStart.Lerp(s.fgEnd, t)))
 }
 

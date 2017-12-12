@@ -10,11 +10,11 @@ type Text struct {
     value string
 }
 
-func (t Text) Print(context Context, index int) {
-    FormatString(os.ExpandEnv(t.value), t.style, context, index)
+func (t Text) Print(segments []Segment, current int) {
+    FormatString(os.ExpandEnv(t.value), t.style, segments, current)
 }
 
-func (t Text) GetStyle(context Context, index int) Style {
+func (t Text) GetStyle(segments []Segment, current int) Style {
     return t.style
 }
 

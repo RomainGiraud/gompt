@@ -11,20 +11,26 @@ type ExitStatus struct {
     textError string
 }
 
-func (e ExitStatus) Print(context Context, index int) {
+func (e ExitStatus) Print(segments []Segment, current int) {
+    FormatString(e.textSuccess, e.styleSuccess, segments, current)
+    /*
     if context.Args.Status == 0 {
         FormatString(e.textSuccess, e.styleSuccess, context, index)
     } else {
         FormatString(e.textError, e.styleError, context, index)
     }
+    */
 }
 
-func (e ExitStatus) GetStyle(context Context, index int) Style {
+func (e ExitStatus) GetStyle(segments []Segment, current int) Style {
+    return e.styleSuccess
+    /*
     if context.Args.Status == 0 {
         return e.styleSuccess
     } else {
         return e.styleError
     }
+    */
 }
 
 func NewExitStatus(styleSuccess Style, styleError Style, textSuccess string, textError string) Segment {

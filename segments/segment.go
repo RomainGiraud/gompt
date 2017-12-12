@@ -8,14 +8,14 @@ import(
 )
 
 
-type Segment interface {
-    Print(Context, int)
-    GetStyle(context Context, index int) Style
-}
-
 type Arguments struct {
     Status int
     ConfigPath string
+}
+
+type Segment interface {
+    Print([]Segment, int)
+    GetStyle([]Segment, int) Style
 }
 
 type Context struct {
@@ -48,7 +48,7 @@ func (c *Context) Display() {
 
     for i, j := 0, 1; i < len(c.Segments); i, j = i+1, j+1 {
         seg := c.Segments[i]
-        seg.Print(*c, i)
+        seg.Print(c.Segments, i)
     }
     fmt.Printf("\n")
 }
