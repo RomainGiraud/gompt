@@ -2,18 +2,8 @@ package segments
 
 import(
     "fmt"
-    _ "log"
-    "errors"
-    _ "strconv"
-    _ "encoding/json"
 )
 
-type Style interface {
-    Format(string, float32, Style, Style) string
-    GetBg() Brush
-    GetFg() Brush
-    Override(Brush, Brush) Style
-}
 
 func FormatString(str string, style Style, segments []Segment, current int) {
     size := float32(len(str))
@@ -45,37 +35,11 @@ func FormatStringArray(strs []string, style Style, separator string, separatorSt
 }
 
 
-func init() {
-    RegisterStyleLoader("standard", LoadStyleStandard)
-    RegisterStyleLoader("cham", LoadStyleChameleon)
-}
-
-type StyleLoader func(map[string]interface{}) Style
-
-var styleLoaders = map[string]StyleLoader{}
-
-func RegisterStyleLoader(name string, fn StyleLoader) {
-    styleLoaders[name] = fn
-}
-
-func LoadStyle(conf interface{}) (Style, error) {
-    config, ok := conf.(map[string]interface{})
-    if ! ok {
-        return nil, errors.New("LoadStyle: cannot parse configuration")
-    }
-
-    typeName, ok := config["type"].(string);
-    if ! ok {
-        return nil, errors.New("LoadStyle: key 'type' does not exists in configuration")
-    }
-
-    val, ok := styleLoaders[typeName];
-    if ! ok {
-        panic("unknown style type: " + typeName)
-        return nil, errors.New("unknown style type: " + typeName)
-    }
-
-    return val(config), nil
+type Style interface {
+    Format(string, float32, Style, Style) string
+    GetBg() Brush
+    GetFg() Brush
+    Override(Brush, Brush) Style
 }
 
 
@@ -105,15 +69,6 @@ func (s StyleStandard) Override(fg Brush, bg Brush) Style {
 
 func (s StyleStandard) Format(str string, t float32, prevStyle Style, nextStyle Style) string {
     return Colorize(str, Bg(s.Bg.ValueAt(t)), Fg(s.Fg.ValueAt(t)))
-}
-
-func LoadStyleStandard(config map[string]interface{}) Style {
-    /*
-    var fg, _ = config["fg"].(string)
-    var bg, _ = config["bg"].(string)
-    return &StyleStandard{ NewColor(fg), NewColor(bg) }
-    */
-    return &StyleStandard{}
 }
 
 
@@ -148,10 +103,4 @@ func (s StyleChameleon) Format(str string, t float32, prevStyle Style, nextStyle
     }
 
     return Colorize(str, Bg(bg), Fg(fg))
-}
-
-func LoadStyleChameleon(config map[string]interface{}) Style {
-    //var fg, _ = config["fg-default"].(string)
-    //var bg, _ = config["bg-default"].(string)
-    return &StyleChameleon{ }
 }
