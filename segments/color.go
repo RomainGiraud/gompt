@@ -1,13 +1,11 @@
 package segments
 
 import(
+    "io"
     "fmt"
-    "bytes"
     "strconv"
 )
 
-//fmt.Println(Colorize("toto", Bg24(0, 155, 0), Fg(30)))
-//fmt.Println(fmt.Sprintf(Color.Bg(46).Fg(30)("toto")))
 
 const escape = "\x1b"
 
@@ -34,7 +32,7 @@ func (b GradientBrush) ValueAt(t float32) Color {
 
 
 type Color interface {
-    Fprintf(buffer *bytes.Buffer, fg bool)
+    Fprintf(writer io.Writer, fg bool)
     Lerp(Color, float32) Color
 }
 
@@ -43,11 +41,11 @@ type Color4 struct {
     value uint8
 }
 
-func (c Color4) Fprintf(buffer *bytes.Buffer, fg bool) {
+func (c Color4) Fprintf(writer io.Writer, fg bool) {
     if fg {
-        fmt.Fprintf(buffer, "%s[%dm", escape, 30 + c.value)
+        fmt.Fprintf(writer, "%s[%dm", escape, 30 + c.value)
     } else {
-        fmt.Fprintf(buffer, "%s[%dm", escape, 40 + c.value)
+        fmt.Fprintf(writer, "%s[%dm", escape, 40 + c.value)
     }
 }
 
@@ -65,11 +63,11 @@ type Color8 struct {
     value uint8
 }
 
-func (c Color8) Fprintf(buffer *bytes.Buffer, fg bool) {
+func (c Color8) Fprintf(writer io.Writer, fg bool) {
     if fg {
-        fmt.Fprintf(buffer, "%s[38;5;%dm", escape, c.value)
+        fmt.Fprintf(writer, "%s[38;5;%dm", escape, c.value)
     } else {
-        fmt.Fprintf(buffer, "%s[48;5;%dm", escape, c.value)
+        fmt.Fprintf(writer, "%s[48;5;%dm", escape, c.value)
     }
 }
 
@@ -87,11 +85,11 @@ type Color24 struct {
     r, g, b uint8
 }
 
-func (c Color24) Fprintf(buffer *bytes.Buffer, fg bool) {
+func (c Color24) Fprintf(writer io.Writer, fg bool) {
     if fg {
-        fmt.Fprintf(buffer, "%s[38;2;%d;%d;%dm", escape, c.r, c.g, c.b)
+        fmt.Fprintf(writer, "%s[38;2;%d;%d;%dm", escape, c.r, c.g, c.b)
     } else {
-        fmt.Fprintf(buffer, "%s[48;2;%d;%d;%dm", escape, c.r, c.g, c.b)
+        fmt.Fprintf(writer, "%s[48;2;%d;%d;%dm", escape, c.r, c.g, c.b)
     }
 }
 
@@ -154,52 +152,50 @@ func NewColor(str string) Color {
 }
 
 
-type Attribute func(*bytes.Buffer) error
+type Attribute func(io.Writer) error
 
-func Colorize(str string, styles ...Attribute) string {
-    return ColorizeFn(styles...)(str)
+func Colorize(writer io.Writer, str string, styles ...Attribute) {
+    ColorizeFn(styles...)(writer, str)
 }
 
-func ColorizeFn(styles ...Attribute) func(str string) string {
-    return func(str string) string {
-        var buffer bytes.Buffer
+func ColorizeFn(styles ...Attribute) func(io.Writer, string) {
+    return func(writer io.Writer, str string) {
+        defer Reset(writer)
         for _, style := range styles {
-            err := style(&buffer)
+            err := style(writer)
             if err != nil {
-                return ""
+                return
             }
         }
-        buffer.WriteString(str)
-        Reset(&buffer)
-        return buffer.String()
+        io.WriteString(writer, str)
     }
 }
 
 func Bg(c Color) Attribute {
-    return func(buffer *bytes.Buffer) error {
-        c.Fprintf(buffer, false)
+    return func(writer io.Writer) error {
+        c.Fprintf(writer, false)
         return nil
     }
 }
 
 func Fg(c Color) Attribute {
-    return func(buffer *bytes.Buffer) error {
-        c.Fprintf(buffer, true)
+    return func(writer io.Writer) error {
+        c.Fprintf(writer, true)
         return nil
     }
 }
 
-func Bold(buffer *bytes.Buffer) error {
-    fmt.Fprintf(buffer, "%s[1m", escape)
+func Bold(writer io.Writer) error {
+    fmt.Fprintf(writer, "%s[1m", escape)
     return nil
 }
 
-func Underline(buffer *bytes.Buffer) error {
-    fmt.Fprintf(buffer, "%s[4m", escape)
+func Underline(writer io.Writer) error {
+    fmt.Fprintf(writer, "%s[4m", escape)
     return nil
 }
 
-func Reset(buffer *bytes.Buffer) error {
-    fmt.Fprintf(buffer, "%s[0m", escape)
+func Reset(writer io.Writer) error {
+    fmt.Fprintf(writer, "%s[0m", escape)
     return nil
 }

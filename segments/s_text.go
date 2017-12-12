@@ -1,6 +1,7 @@
 package segments
 
 import(
+    "io"
     "os"
     "os/exec"
     "strings"
@@ -35,9 +36,9 @@ func getenv(key string) string {
     return os.Getenv(key)
 }
 
-func (t Text) Print(segments []Segment, current int) {
+func (t Text) Print(writer io.Writer, segments []Segment, current int) {
     str := os.Expand(t.value, getenv)
-    FormatString(str, t.style, segments, current)
+    FormatString(writer, str, t.style, segments, current)
 }
 
 func (t Text) GetStyle(segments []Segment, current int) Style {
