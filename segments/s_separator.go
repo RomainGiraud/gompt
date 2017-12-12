@@ -22,12 +22,3 @@ func (s Separator) GetStyle(segments []Segment, current int) Style {
 func NewSeparator(text string, style Style) Segment {
     return &Separator{ style, text }
 }
-
-func LoadSeparator(config map[string]interface{}) Segment {
-    var style, _ = LoadStyle(config["style"])
-    return &Separator{ style, config["text"].(string) }
-}
-
-func init() {
-    RegisterSegmentLoader("separator", LoadSeparator)
-}

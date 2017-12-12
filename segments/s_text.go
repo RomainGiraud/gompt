@@ -47,13 +47,3 @@ func (t Text) GetStyle(segments []Segment, current int) Style {
 func NewText(style Style, text string) Segment {
     return &Text{ style, text }
 }
-
-func LoadText(config map[string]interface{}) Segment {
-    var style, _ = LoadStyle(config["style"])
-    var text, _  = config["text"].(string)
-    return &Text{ style, text }
-}
-
-func init() {
-    RegisterSegmentLoader("text", LoadText)
-}

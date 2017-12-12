@@ -25,12 +25,3 @@ func (p Path) GetStyle(segments []Segment, current int) Style {
 func NewPath(style Style) Segment {
     return &Path{ style }
 }
-
-func LoadPath(config map[string]interface{}) Segment {
-    var style, _ = LoadStyle(config["style"])
-    return &Path{ style }
-}
-
-func init() {
-    RegisterSegmentLoader("path", LoadPath)
-}

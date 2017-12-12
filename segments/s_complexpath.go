@@ -34,14 +34,3 @@ func (p ComplexPath) GetStyle(segments []Segment, current int) Style {
 func NewComplexPath(style Style, separator string, fgSeparator Brush) Segment {
     return &ComplexPath{ style, separator, fgSeparator }
 }
-
-func LoadComplexPath(config map[string]interface{}) Segment {
-    //var style, _ = LoadStyle(config["style"])
-    //var sep, _  = config["separator"].(string);
-    //var fg_sep, _  = config["fg-separator"].(string);
-    return &ComplexPath{ }
-}
-
-func init() {
-    RegisterSegmentLoader("complex-path", LoadComplexPath)
-}
