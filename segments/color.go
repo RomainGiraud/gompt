@@ -33,7 +33,7 @@ func (c Color4) Fprintf(buffer *bytes.Buffer, fg bool) {
 func (c Color4) Lerp(other Color, t float32) Color  {
     switch o := other.(type) {
     case Color4:
-        return Color4{ c.value + uint8(t * float32(o.value - c.value)) }
+        return Color4{ c.value + uint8(t * float32(int16(o.value) - int16(c.value))) }
     default:
         return c
     }
@@ -55,7 +55,7 @@ func (c Color8) Fprintf(buffer *bytes.Buffer, fg bool) {
 func (c Color8) Lerp(other Color, t float32) Color {
     switch o := other.(type) {
     case Color8:
-        return Color8{ c.value + uint8(t * float32(o.value - c.value)) }
+        return Color8{ c.value + uint8(t * float32(int16(o.value) - int16(c.value))) }
     default:
         return c
     }
@@ -78,9 +78,9 @@ func (c Color24) Lerp(other Color, t float32) Color {
     switch o := other.(type) {
     case Color24:
         return Color24{
-            c.r + uint8(t * float32(o.r - c.r)),
-            c.g + uint8(t * float32(o.g - c.g)),
-            c.b + uint8(t * float32(o.b - c.b)),
+            c.r + uint8(t * float32(int16(o.r) - int16(c.r))),
+            c.g + uint8(t * float32(int16(o.g) - int16(c.g))),
+            c.b + uint8(t * float32(int16(o.b) - int16(c.b))),
         }
     default:
         return c
@@ -182,28 +182,3 @@ func Reset(buffer *bytes.Buffer) error {
     fmt.Fprintf(buffer, "%s[0m", escape)
     return nil
 }
-
-
-
-/*
-type Color struct {
-    Background
-}
-
-func (c *Color) Bg(bg Background) *Color {
-    return c
-}
-
-//return fmt.Sprintf("\x1b[%d;47m%s\x1b[0m", 30, dir)
-func Bg(bg Background) (func(string) string) {
-    return func(str string) string {
-        return fmt.Sprintf("%s[%dm%s%s[0m", escape, bg, str, escape)
-    }
-}
-
-func Fg(fg Foreground) (func(string) string) {
-    return func(str string) string {
-        return fmt.Sprintf("%s[%dm%s%s[0m", escape, fg, str, escape)
-    }
-}
-*/
