@@ -2,7 +2,7 @@ package main
 
 import(
     "flag"
-    "prompt/segments"
+    "github.com/RomainGiraud/gompt/segments"
 )
 
 
