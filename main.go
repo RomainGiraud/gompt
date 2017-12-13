@@ -31,8 +31,7 @@ func main() {
     segmentList := segments.SegmentList {
         exitStatus,
         segments.NewUsername( segments.StyleStandard{ segments.UniBrush{ segments.Green }, segments.UniBrush{ segments.NewColor("#555") } } ),
-        segments.NewSeparator( "\u2588\u2588\u2588\u2588\ue0b0        ", segments.StyleChameleon{ } ),
-        segments.NewText( segments.StyleStandard{ segments.UniBrush{ segments.NewColor("#0000ff") }, segments.UniBrush{ segments.NewColor("#fff") } }, "${cmd> ls -la | wc -l}@" ),
+        segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
         segments.NewHostname( segments.StyleStandard{ segments.UniBrush{ segments.NewColor("#0000f0") }, segments.GradientBrush{ segments.NewColor("#fff"), segments.NewColor("#aaa") } } ),
         segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
         segments.NewComplexPath(
