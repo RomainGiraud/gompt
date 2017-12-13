@@ -30,7 +30,9 @@ func FormatStringArray(writer io.Writer, strs []string, style Style, separator s
             nextStyle = segments[current + 1].GetStyle(segments, current + 1)
         }
         style.Format(writer, s, float32(i) / size, prevStyle, nextStyle)
-        style.Override(separatorStyle, nil).Format(writer, separator, float32(i) / size, prevStyle, nextStyle)
+        if (i + 1) != int(size) {
+            style.Override(separatorStyle, nil).Format(writer, separator, float32(i) / size, prevStyle, nextStyle)
+        }
     }
 }
 
