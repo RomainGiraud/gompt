@@ -32,14 +32,13 @@ func main() {
         exitStatus,
         segments.NewUsername( segments.StyleStandard{ segments.UniBrush{ segments.Green }, segments.UniBrush{ segments.NewColor("#555") } } ),
         segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
-        segments.NewHostname( segments.StyleStandard{ segments.UniBrush{ segments.NewColor("#0000f0") }, segments.GradientBrush{ segments.NewColor("#fff"), segments.NewColor("#aaa") } } ),
+        segments.NewHostname( segments.StyleStandard{ segments.UniBrush{ segments.Black }, segments.UniBrush{ segments.Blue } } ),
         segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
-        segments.NewComplexPath(
+        segments.NewComplexPathPlain(
             segments.StyleStandard{
                 segments.UniBrush{ segments.NewColor("#555") },
                 segments.GradientBrush{ segments.NewColor("#aaa"), segments.NewColor("#fff") } },
-            "\ue0b1",
-            segments.UniBrush{ segments.Red } ),
+            "\ue0b1", segments.Red, 3, "\u2026"),
         segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
     }
 

@@ -2,46 +2,92 @@ package segments
 
 import(
     "io"
+    "unicode/utf8"
 )
 
 
 func FormatString(writer io.Writer, str string, style Style, segments []Segment, current int) {
-    size := float32(len(str))
+    size := float32(len(str) - 1)
+
+    var prevStyle, nextStyle StyleSnapshot = nil, nil
+
+    if current != 0 {
+        prevStyle = segments[current - 1].GetStyle(segments, current - 1).ValueAt(1)
+    }
+
+    if (current + 1) < len(segments) {
+        nextStyle = segments[current + 1].GetStyle(segments, current + 1).ValueAt(0)
+    }
+
     for i, s := range str {
-        var prevStyle, nextStyle Style = nil, nil
-        if current != 0 {
-            prevStyle = segments[current - 1].GetStyle(segments, current - 1)
-        }
-        if (current + 1) < len(segments) {
-            nextStyle = segments[current + 1].GetStyle(segments, current + 1)
-        }
-        style.Format(writer, string(s), float32(i) / size, prevStyle, nextStyle)
+        style.ValueAt(float32(i) / size).Format(writer, string(s), prevStyle, nextStyle)
     }
 }
 
-func FormatStringArray(writer io.Writer, strs []string, style Style, separator string, separatorStyle Brush, segments []Segment, current int) {
-    size := float32(len(strs))
+func FormatStringArrayPlain(writer io.Writer, strs []string, style Style, separator string, separatorStyle Color, segments []Segment, current int) {
+    var prevStyle, nextStyle StyleSnapshot = nil, nil
+
+    if current != 0 {
+        prevStyle = segments[current - 1].GetStyle(segments, current - 1).ValueAt(1)
+    }
+
+    if (current + 1) < len(segments) {
+        nextStyle = segments[current + 1].GetStyle(segments, current + 1).ValueAt(0)
+    }
+
+    size := float32((len(strs) - 1) * utf8.RuneCountInString(separator) - 1)
+    for _, s := range strs {
+        size += float32(utf8.RuneCountInString(s))
+    }
+
+    idx := float32(0)
+    for i, ss := range strs {
+        for _, s := range ss {
+            style.ValueAt(idx / size).Format(writer, string(s), prevStyle, nextStyle)
+            idx += 1
+        }
+        
+        if (i + 1) < len(strs) {
+            style.ValueAt(idx / size).Override(separatorStyle, nil).Format(writer, separator, prevStyle, nextStyle)
+            idx += 1
+        }
+    }
+}
+
+func FormatStringArrayBlock(writer io.Writer, strs []string, style Style, separator string, separatorStyle Style, segments []Segment, current int) {
+    var prevStyle, nextStyle StyleSnapshot = nil, nil
+
+    if current != 0 {
+        prevStyle = segments[current - 1].GetStyle(segments, current - 1).ValueAt(1)
+    }
+
+    if (current + 1) < len(segments) {
+        nextStyle = segments[current + 1].GetStyle(segments, current + 1).ValueAt(0)
+    }
+
+    size := float32(len(strs) - 1)
     for i, s := range strs {
-        var prevStyle, nextStyle Style = nil, nil
-        if current != 0 {
-            prevStyle = segments[current - 1].GetStyle(segments, current - 1)
-        }
-        if (current + 1) < len(segments) {
-            nextStyle = segments[current + 1].GetStyle(segments, current + 1)
-        }
-        style.Format(writer, s, float32(i) / size, prevStyle, nextStyle)
-        if (i + 1) != int(size) {
-            style.Override(separatorStyle, nil).Format(writer, separator, float32(i) / size, prevStyle, nextStyle)
+        idx := float32(i)
+
+        currentStyle := style.ValueAt(idx / size)
+        currentStyle.Format(writer, s, prevStyle, nextStyle)
+
+        if (int(idx) + 1) < len(strs) {
+            separatorStyle.ValueAt(0).Format(writer, separator, currentStyle, style.ValueAt((idx + 1) / size))
         }
     }
 }
 
 
 type Style interface {
-    Format(io.Writer, string, float32, Style, Style)
-    GetBg() Brush
-    GetFg() Brush
-    Override(Brush, Brush) Style
+    ValueAt(t float32) StyleSnapshot
+}
+
+type StyleSnapshot interface {
+    Format(io.Writer, string, StyleSnapshot, StyleSnapshot)
+    GetFg() Color
+    GetBg() Color
+    Override(Color, Color) StyleSnapshot
 }
 
 
@@ -50,59 +96,83 @@ type StyleStandard struct {
     Bg Brush
 }
 
-func (s StyleStandard) GetBg() Brush {
-    return s.Bg
+type StyleSnapshotStandard struct {
+    fg Color
+    bg Color
 }
 
-func (s StyleStandard) GetFg() Brush {
-    return s.Fg
+func (s StyleStandard) ValueAt(t float32) StyleSnapshot {
+    var snapshot StyleSnapshotStandard
+    if s.Fg != nil {
+        snapshot.fg = s.Fg.ValueAt(t)
+    }
+    if s.Bg != nil {
+        snapshot.bg = s.Bg.ValueAt(t)
+    }
+    return snapshot
 }
 
-func (s StyleStandard) Override(fg Brush, bg Brush) Style {
-    var newStyle StyleStandard = s
+func (s StyleSnapshotStandard) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
+    Colorize(writer, str, Bg(s.bg), Fg(s.fg))
+}
+
+func (s StyleSnapshotStandard) GetFg() Color {
+    return s.fg
+}
+
+func (s StyleSnapshotStandard) GetBg() Color {
+    return s.bg
+}
+
+func (s StyleSnapshotStandard) Override(fg Color, bg Color) StyleSnapshot {
+    var newSs StyleSnapshotStandard = s
     if fg != nil {
-        newStyle.Fg = fg
+        newSs.fg = fg
     }
     if bg != nil {
-        newStyle.Bg = bg
+        newSs.bg = bg
     }
-    return newStyle
-}
-
-func (s StyleStandard) Format(writer io.Writer, str string, t float32, prevStyle Style, nextStyle Style) {
-    Colorize(writer, str, Bg(s.Bg.ValueAt(t)), Fg(s.Fg.ValueAt(t)))
+    return newSs
 }
 
 
 type StyleChameleon struct {
 }
 
-func (s StyleChameleon) GetBg() Brush {
-    return nil
+type StyleSnapshotChameleon struct {
 }
 
-func (s StyleChameleon) GetFg() Brush {
-    return nil
+func (s StyleChameleon) ValueAt(t float32) StyleSnapshot {
+    var snapshot StyleSnapshotChameleon
+    return snapshot
 }
 
-func (s StyleChameleon) Override(fg Brush, bg Brush) Style {
-    return s
-}
-
-func (s StyleChameleon) Format(writer io.Writer, str string, t float32, prevStyle Style, nextStyle Style) {
+func (s StyleSnapshotChameleon) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
     fg := NewColor("default")
-    if prevStyle != nil {
-        if style := prevStyle.GetBg(); style != nil {
-            fg = style.ValueAt(1)
+    if prev != nil {
+        if c := prev.GetBg(); c != nil {
+            fg = c
         }
     }
 
     bg := NewColor("default")
-    if nextStyle != nil {
-        if style := nextStyle.GetBg(); style != nil {
-            bg = style.ValueAt(0)
+    if next != nil {
+        if c := next.GetBg(); c != nil {
+            bg = c
         }
     }
 
     Colorize(writer, str, Bg(bg), Fg(fg))
+}
+
+func (s StyleSnapshotChameleon) GetFg() Color {
+    return nil
+}
+
+func (s StyleSnapshotChameleon) GetBg() Color {
+    return nil
+}
+
+func (s StyleSnapshotChameleon) Override(fg Color, bg Color) StyleSnapshot {
+    return s
 }

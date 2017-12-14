@@ -173,6 +173,9 @@ func ColorizeFn(styles ...Attribute) func(io.Writer, string) {
 
 func Bg(c Color) Attribute {
     return func(writer io.Writer) error {
+        if c == nil {
+            return nil
+        }
         c.Fprintf(writer, false)
         return nil
     }
@@ -180,6 +183,9 @@ func Bg(c Color) Attribute {
 
 func Fg(c Color) Attribute {
     return func(writer io.Writer) error {
+        if c == nil {
+            return nil
+        }
         c.Fprintf(writer, true)
         return nil
     }
