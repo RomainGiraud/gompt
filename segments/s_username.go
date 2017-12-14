@@ -12,7 +12,7 @@ type Username struct {
 
 func (u Username) Print(writer io.Writer, segments []Segment, current int) {
     uc, _ := user.Current()
-    FormatString(writer, uc.Username, u.style, segments, current)
+    FormatString(writer, " " + uc.Username + " ", u.style, segments, current)
 }
 
 func (u Username) GetStyle(segments []Segment, current int) Style {

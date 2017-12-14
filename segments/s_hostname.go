@@ -12,7 +12,7 @@ type Hostname struct {
 
 func (h Hostname) Print(writer io.Writer, segments []Segment, current int) {
     n, _ := os.Hostname()
-    FormatString(writer, n, h.style, segments, current)
+    FormatString(writer, " " + n + " ", h.style, segments, current)
 }
 
 func (h Hostname) GetStyle(segments []Segment, current int) Style {
