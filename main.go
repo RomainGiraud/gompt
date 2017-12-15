@@ -31,15 +31,15 @@ func main() {
     segmentList := segments.SegmentList {
         exitStatus,
         segments.NewUsername( segments.StyleStandard{ segments.UniBrush{ segments.Green }, segments.UniBrush{ segments.NewColor("#555") } } ),
-        segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
+        segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ),
         segments.NewHostname( segments.StyleStandard{ segments.UniBrush{ segments.Black }, segments.UniBrush{ segments.Blue } } ),
-        segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
+        segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ),
         segments.NewComplexPathPlain(
             segments.StyleStandard{
                 segments.UniBrush{ segments.NewColor("#555") },
                 segments.GradientBrush{ segments.NewColor("#aaa"), segments.NewColor("#fff") } },
             "\ue0b1", segments.Red, 3, "\u2026"),
-        segments.NewSeparator( "\ue0b0", segments.StyleChameleon{ } ),
+        segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ),
     }
 
     var buffer bytes.Buffer
