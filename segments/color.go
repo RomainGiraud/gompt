@@ -152,7 +152,7 @@ func NewColor(str string) Color {
 }
 
 
-type Attribute func(io.Writer) error
+type Attribute func(io.Writer)
 
 func Colorize(writer io.Writer, str string, styles ...Attribute) {
     ColorizeFn(styles...)(writer, str)
@@ -162,46 +162,38 @@ func ColorizeFn(styles ...Attribute) func(io.Writer, string) {
     return func(writer io.Writer, str string) {
         defer Reset(writer)
         for _, style := range styles {
-            err := style(writer)
-            if err != nil {
-                return
-            }
+            style(writer)
         }
         io.WriteString(writer, str)
     }
 }
 
 func Bg(c Color) Attribute {
-    return func(writer io.Writer) error {
+    return func(writer io.Writer) {
         if c == nil {
-            return nil
+            return
         }
         c.Fprintf(writer, false)
-        return nil
     }
 }
 
 func Fg(c Color) Attribute {
-    return func(writer io.Writer) error {
+    return func(writer io.Writer) {
         if c == nil {
-            return nil
+            return
         }
         c.Fprintf(writer, true)
-        return nil
     }
 }
 
-func Bold(writer io.Writer) error {
+func Bold(writer io.Writer) {
     fmt.Fprintf(writer, "%s[1m", escape)
-    return nil
 }
 
-func Underline(writer io.Writer) error {
+func Underline(writer io.Writer) {
     fmt.Fprintf(writer, "%s[4m", escape)
-    return nil
 }
 
-func Reset(writer io.Writer) error {
+func Reset(writer io.Writer) {
     fmt.Fprintf(writer, "%s[0m", escape)
-    return nil
 }
