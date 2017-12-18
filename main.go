@@ -39,10 +39,10 @@ func main() {
                 segments.UniBrush{ segments.NewColor("#555") },
                 segments.GradientBrush{ segments.NewColor("#aaa"), segments.NewColor("#fff") } },
             "\ue0b1", segments.Red, 3, "\u2026"),
-        segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ),
+        segments.NewText( segments.StyleChameleon{ }, "\ue0b0 " ),
     }
 
     var buffer bytes.Buffer
-    segmentList.Display(&buffer)
+    segmentList.Render(&buffer)
     fmt.Println(buffer.String())
 }

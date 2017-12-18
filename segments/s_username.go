@@ -10,13 +10,13 @@ type Username struct {
     style Style
 }
 
-func (u Username) Print(writer io.Writer, segments []Segment, current int) {
+func (s Username) Print(writer io.Writer, segments []Segment, current int) {
     uc, _ := user.Current()
-    FormatString(writer, " " + uc.Username + " ", u.style, segments, current)
+    FormatString(writer, " " + uc.Username + " ", s.style, segments, current)
 }
 
-func (u Username) GetStyle(segments []Segment, current int) Style {
-    return u.style
+func (s Username) GetStyle(segments []Segment, current int) Style {
+    return s.style
 }
 
 func NewUsername(style Style) Segment {

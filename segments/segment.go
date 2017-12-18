@@ -17,7 +17,7 @@ type Segment interface {
 
 type SegmentList []Segment
 
-func (segments *SegmentList) Display(writer io.Writer) {
+func (segments *SegmentList) Render(writer io.Writer) {
     if len(*segments) == 0 {
         panic("Empty prompt")
     }

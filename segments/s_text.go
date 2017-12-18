@@ -36,13 +36,13 @@ func getenv(key string) string {
     return os.Getenv(key)
 }
 
-func (t Text) Print(writer io.Writer, segments []Segment, current int) {
-    str := os.Expand(t.value, getenv)
-    FormatString(writer, str, t.style, segments, current)
+func (s Text) Print(writer io.Writer, segments []Segment, current int) {
+    str := os.Expand(s.value, getenv)
+    FormatString(writer, str, s.style, segments, current)
 }
 
-func (t Text) GetStyle(segments []Segment, current int) Style {
-    return t.style
+func (s Text) GetStyle(segments []Segment, current int) Style {
+    return s.style
 }
 
 func NewText(style Style, text string) Segment {
