@@ -17,7 +17,7 @@ type ComplexPath struct {
     ellipsis string
 }
 
-func (p ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
+func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
     dir, err := os.Getwd()
     if err != nil {
         log.Fatal(err)
@@ -29,23 +29,23 @@ func (p ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
     }
 
     dir_s := strings.Split(dir, "/")
-    if p.maxDepth != 0 && len(dir_s) > int(p.maxDepth) {
-        dir_s = dir_s[len(dir_s) - int(p.maxDepth):]
-        dir_s[0] = p.ellipsis
+    if s.maxDepth != 0 && len(dir_s) > int(s.maxDepth) {
+        dir_s = dir_s[len(dir_s) - int(s.maxDepth):]
+        dir_s[0] = s.ellipsis
     }
     for i, v := range dir_s {
         dir_s[i] = " " + v + " "
     }
 
-    if p.isPlain {
-        FormatStringArrayPlain(writer, dir_s, p.style, p.separator, p.fgSeparator, segments, current)
+    if s.isPlain {
+        FormatStringArrayPlain(writer, dir_s, s.style, s.separator, s.fgSeparator, segments, current)
     } else {
-        FormatStringArrayBlock(writer, dir_s, p.style, p.separator, StyleChameleon{ }, segments, current)
+        FormatStringArrayBlock(writer, dir_s, s.style, s.separator, StyleChameleon{ }, segments, current)
     }
 }
 
-func (p ComplexPath) GetStyle(segments []Segment, current int) Style {
-    return p.style
+func (s ComplexPath) GetStyle(segments []Segment, current int) Style {
+    return s.style
 }
 
 func NewComplexPathPlain(style Style, separator string, fgSeparator Color, maxDepth uint, ellipsis string) Segment {

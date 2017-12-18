@@ -10,13 +10,13 @@ type Hostname struct {
     style Style
 }
 
-func (h Hostname) Print(writer io.Writer, segments []Segment, current int) {
+func (s Hostname) Print(writer io.Writer, segments []Segment, current int) {
     n, _ := os.Hostname()
-    FormatString(writer, " " + n + " ", h.style, segments, current)
+    FormatString(writer, " " + n + " ", s.style, segments, current)
 }
 
-func (h Hostname) GetStyle(segments []Segment, current int) Style {
-    return h.style
+func (s Hostname) GetStyle(segments []Segment, current int) Style {
+    return s.style
 }
 
 func NewHostname(style Style) Segment {
