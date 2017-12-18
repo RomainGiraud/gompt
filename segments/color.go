@@ -7,7 +7,11 @@ import(
 )
 
 
-const escape = "\x1b"
+func escapedPrint(writer io.Writer, a ...interface{}) {
+    fmt.Fprint(writer, "\\[\\e[")
+    fmt.Fprint(writer, a...)
+    fmt.Fprint(writer, "m\\]")
+}
 
 type Brush interface {
     ValueAt(float32) Color
@@ -43,9 +47,9 @@ type Color4 struct {
 
 func (c Color4) Fprintf(writer io.Writer, fg bool) {
     if fg {
-        fmt.Fprintf(writer, "%s[%dm", escape, 30 + c.value)
+        escapedPrint(writer, 30 + c.value)
     } else {
-        fmt.Fprintf(writer, "%s[%dm", escape, 40 + c.value)
+        escapedPrint(writer, 40 + c.value)
     }
 }
 
@@ -65,9 +69,9 @@ type Color8 struct {
 
 func (c Color8) Fprintf(writer io.Writer, fg bool) {
     if fg {
-        fmt.Fprintf(writer, "%s[38;5;%dm", escape, c.value)
+        escapedPrint(writer, "38;5;", c.value)
     } else {
-        fmt.Fprintf(writer, "%s[48;5;%dm", escape, c.value)
+        escapedPrint(writer, "48;5;", c.value)
     }
 }
 
@@ -87,9 +91,9 @@ type Color24 struct {
 
 func (c Color24) Fprintf(writer io.Writer, fg bool) {
     if fg {
-        fmt.Fprintf(writer, "%s[38;2;%d;%d;%dm", escape, c.r, c.g, c.b)
+        escapedPrint(writer, "38;2;", c.r, ";", c.g, ";", c.b)
     } else {
-        fmt.Fprintf(writer, "%s[48;2;%d;%d;%dm", escape, c.r, c.g, c.b)
+        escapedPrint(writer, "48;2;", c.r, ";", c.g, ";", c.b)
     }
 }
 
@@ -187,13 +191,13 @@ func Fg(c Color) Attribute {
 }
 
 func Bold(writer io.Writer) {
-    fmt.Fprintf(writer, "%s[1m", escape)
+    escapedPrint(writer, 1)
 }
 
 func Underline(writer io.Writer) {
-    fmt.Fprintf(writer, "%s[4m", escape)
+    escapedPrint(writer, 4)
 }
 
 func Reset(writer io.Writer) {
-    fmt.Fprintf(writer, "%s[0m", escape)
+    escapedPrint(writer, 0)
 }
