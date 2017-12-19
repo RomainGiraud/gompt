@@ -17,6 +17,10 @@ type ComplexPath struct {
     ellipsis string
 }
 
+func (s ComplexPath) Load() []Segment {
+    return []Segment{ s }
+}
+
 func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
     dir, err := os.Getwd()
     if err != nil {
