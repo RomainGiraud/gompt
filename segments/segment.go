@@ -11,6 +11,7 @@ type Arguments struct {
 }
 
 type Segment interface {
+    Load() []Segment
     Print(io.Writer, []Segment, int)
     GetStyle([]Segment, int) Style
 }
@@ -22,8 +23,14 @@ func (segments *SegmentList) Render(writer io.Writer) {
         panic("Empty prompt")
     }
 
+    var toRender SegmentList
     for i, j := 0, 1; i < len(*segments); i, j = i+1, j+1 {
         seg := (*segments)[i]
-        seg.Print(writer, *segments, i)
+        toRender = append(toRender, seg.Load()...)
+    }
+
+    for i, j := 0, 1; i < len(toRender); i, j = i+1, j+1 {
+        seg := toRender[i]
+        seg.Print(writer, toRender, i)
     }
 }
