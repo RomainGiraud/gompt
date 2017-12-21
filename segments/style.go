@@ -24,7 +24,18 @@ func FormatString(writer io.Writer, str string, style Style, segments []Segment,
     }
 }
 
-func FormatStringArrayPlain(writer io.Writer, strs []string, style Style, separator string, separatorStyle Color, segments []Segment, current int) {
+type PartFormatter struct {
+    str string
+    fg Color
+    bg Color
+}
+
+func FormatParts(writer io.Writer, style Style, segments []Segment, current int, strs []PartFormatter) {
+    sizeMax := 0
+    for _, s := range strs {
+        sizeMax += utf8.RuneCountInString(s.str)
+    }
+
     var prevStyle, nextStyle StyleSnapshot = nil, nil
 
     if current != 0 {
@@ -35,21 +46,11 @@ func FormatStringArrayPlain(writer io.Writer, strs []string, style Style, separa
         nextStyle = segments[current + 1].GetStyle(segments, current + 1).ValueAt(0)
     }
 
-    size := float32((len(strs) - 1) * utf8.RuneCountInString(separator) - 1)
+    i := 0
     for _, s := range strs {
-        size += float32(utf8.RuneCountInString(s))
-    }
-
-    idx := float32(0)
-    for i, ss := range strs {
-        for _, s := range ss {
-            style.ValueAt(idx / size).Format(writer, string(s), prevStyle, nextStyle)
-            idx += 1
-        }
-        
-        if (i + 1) < len(strs) {
-            style.ValueAt(idx / size).Override(separatorStyle, nil).Format(writer, separator, prevStyle, nextStyle)
-            idx += 1
+        for _, c := range s.str {
+            style.ValueAt(float32(i) / float32(sizeMax)).Override(s.fg, s.bg).Format(writer, string(c), prevStyle, nextStyle)
+            i += 1
         }
     }
 }
