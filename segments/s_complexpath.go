@@ -42,7 +42,13 @@ func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
     }
 
     if s.isPlain {
-        FormatStringArrayPlain(writer, dir_s, s.style, s.separator, s.fgSeparator, segments, current)
+        ff := []PartFormatter{}
+        for i := 0; i < len(dir_s) - 1; i += 1 {
+            ff = append(ff, PartFormatter{ dir_s[i], nil, nil })
+            ff = append(ff, PartFormatter{ s.separator, s.fgSeparator, nil })
+        }
+        ff = append(ff, PartFormatter{ dir_s[len(dir_s) - 1], nil, nil })
+        FormatParts(writer, s.style, segments, current, ff)
     } else {
         FormatStringArrayBlock(writer, dir_s, s.style, s.separator, StyleChameleon{ }, segments, current)
     }
