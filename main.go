@@ -41,7 +41,7 @@ func main() {
             "\ue0b1", segments.Red, 3, "\u2026"),
         segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ),
         segments.NewBinding(
-            segments.NewGit( segments.StyleStandard{ segments.UniBrush{ segments.Black }, segments.UniBrush{ segments.Green } } ),
+            segments.NewGit( segments.StyleStandard{ segments.UniBrush{ segments.White }, segments.UniBrush{ segments.NewColor("#444") } } ),
             segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ) ),
         segments.NewText( segments.StyleStandard{ }, " " ),
     }

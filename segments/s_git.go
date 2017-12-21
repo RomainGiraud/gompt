@@ -70,18 +70,34 @@ func (s Git) Load() []Segment {
     status := strings.Split(statusOutput, "\n")
 
     s.branch, s.ahead, s.behind = ParseBranch(status[0])
-    s.clean = len(status[1:]) != 0
+    s.clean = (len(status[1:]) == 0)
     s.stash = GetStashCount()
 
     return []Segment{ s }
 }
 
 func (s Git) Print(writer io.Writer, segments []Segment, current int) {
-    // ahead  "\uf176"
-    // behind "\uf175"
-    // dirty  "\ue00a"
-    // stash  "\uf024"
-    FormatString(writer, " " + s.branch + " ", s.style, segments, current)
+    ff := []PartFormatter{
+        PartFormatter{ " ", nil, nil },
+        PartFormatter{ s.branch, nil, nil },
+    }
+    if s.ahead != 0 {
+        ff = append(ff, PartFormatter{ "\uf139" + strconv.Itoa(s.ahead), nil, nil })
+    }
+    if s.behind != 0 {
+        ff = append(ff, PartFormatter{ "\uf13a" + strconv.Itoa(s.behind), nil, nil })
+    }
+    if !s.clean || s.stash != 0 {
+        //ff = append(ff, PartFormatter{ "|", nil, nil })
+        if s.stash != 0 {
+            ff = append(ff, PartFormatter{ "\uf111", Blue, nil })
+        }
+        if !s.clean {
+            ff = append(ff, PartFormatter{ "\uf057", Red, nil })
+        }
+    }
+    ff = append(ff, PartFormatter{ " ", nil, nil })
+    FormatParts(writer, s.style, segments, current, ff)
 }
 
 func (s Git) GetStyle(segments []Segment, current int) Style {
