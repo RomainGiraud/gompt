@@ -10,18 +10,16 @@ import(
 
 type ComplexPath struct {
     style Style
+    styleUnit Style
     isPlain bool
     separator string
     fgSeparator Color
     maxDepth uint
     ellipsis string
+    directories []string
 }
 
 func (s ComplexPath) Load() []Segment {
-    return []Segment{ s }
-}
-
-func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
     dir, err := os.Getwd()
     if err != nil {
         log.Fatal(err)
@@ -32,36 +30,44 @@ func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
         dir = strings.Replace(dir, home_dir, "~", 1)
     }
 
-    dir_s := strings.Split(dir, "/")
-    if s.maxDepth != 0 && len(dir_s) > int(s.maxDepth) {
-        dir_s = dir_s[len(dir_s) - int(s.maxDepth):]
-        dir_s[0] = s.ellipsis
+    s.directories = strings.Split(dir, "/")
+    if s.maxDepth != 0 && len(s.directories) > int(s.maxDepth) {
+        s.directories = s.directories[len(s.directories) - int(s.maxDepth):]
+        s.directories[0] = s.ellipsis
     }
-    for i, v := range dir_s {
-        dir_s[i] = " " + v + " "
+
+    return []Segment{ s }
+}
+
+func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
+    for i, v := range s.directories {
+        s.directories[i] = " " + v + " "
     }
 
     if s.isPlain {
         ff := []PartFormatter{}
-        for i := 0; i < len(dir_s) - 1; i += 1 {
-            ff = append(ff, PartFormatter{ dir_s[i], nil, nil })
+        for i := 0; i < len(s.directories) - 1; i += 1 {
+            ff = append(ff, PartFormatter{ s.directories[i], nil, nil })
             ff = append(ff, PartFormatter{ s.separator, s.fgSeparator, nil })
         }
-        ff = append(ff, PartFormatter{ dir_s[len(dir_s) - 1], nil, nil })
+        ff = append(ff, PartFormatter{ s.directories[len(s.directories) - 1], nil, nil })
         FormatParts(writer, s.style, segments, current, ff)
     } else {
-        FormatStringArrayBlock(writer, dir_s, s.style, s.separator, StyleChameleon{ }, segments, current)
+        FormatStringArrayBlock(writer, s.directories, s.style, s.separator, StyleChameleon{ }, segments, current)
     }
 }
 
 func (s ComplexPath) GetStyle(segments []Segment, current int) Style {
+    if !s.isPlain && len(s.directories) == 1 {
+        return s.styleUnit
+    }
     return s.style
 }
 
-func NewComplexPathPlain(style Style, separator string, fgSeparator Color, maxDepth uint, ellipsis string) Segment {
-    return &ComplexPath{ style, true, separator, fgSeparator, maxDepth, ellipsis }
+func NewComplexPathPlain(style Style, styleUnit Style, separator string, fgSeparator Color, maxDepth uint, ellipsis string) Segment {
+    return &ComplexPath{ style, styleUnit, true, separator, fgSeparator, maxDepth, ellipsis, []string{} }
 }
 
-func NewComplexPathSplitted(style Style, separator string, maxDepth uint, ellipsis string) Segment {
-    return &ComplexPath{ style, false, separator, nil, maxDepth, ellipsis }
+func NewComplexPathSplitted(style Style, styleUnit Style, separator string, maxDepth uint, ellipsis string) Segment {
+    return &ComplexPath{ style, styleUnit, false, separator, nil, maxDepth, ellipsis, []string{} }
 }
