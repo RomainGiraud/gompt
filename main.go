@@ -38,6 +38,9 @@ func main() {
             segments.StyleStandard{
                 segments.UniBrush{ segments.NewColor("#333") },
                 segments.GradientBrush{ segments.NewColor("#aaa"), segments.NewColor("#eee") } },
+            segments.StyleStandard{
+                segments.UniBrush{ segments.NewColor("#333") },
+                segments.UniBrush{ segments.NewColor("#eee") } },
             "\ue0b4", 3, "\u2026"),
         segments.NewBinding(
             segments.NewText( segments.StyleChameleon{ }, "\ue0b0" ),
