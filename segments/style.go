@@ -67,16 +67,16 @@ func FormatStringArrayBlock(writer io.Writer, strs []string, style Style, separa
     }
 
     size := float32(len(strs) - 1)
-    for i, s := range strs {
+    for i := 0; i < len(strs) - 1; i += 1 {
         idx := float32(i)
 
         currentStyle := style.ValueAt(idx / size)
-        currentStyle.Format(writer, s, prevStyle, nextStyle)
+        currentStyle.Format(writer, strs[i], prevStyle, nextStyle)
 
-        if (int(idx) + 1) < len(strs) {
-            separatorStyle.ValueAt(0).Format(writer, separator, currentStyle, style.ValueAt((idx + 1) / size))
-        }
+        separatorStyle.ValueAt(0).Format(writer, separator, currentStyle, style.ValueAt((idx + 1) / size))
     }
+
+    style.ValueAt(1).Format(writer, strs[len(strs) - 1], prevStyle, nextStyle)
 }
 
 
