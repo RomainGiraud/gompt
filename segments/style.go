@@ -49,7 +49,7 @@ func FormatParts(writer io.Writer, style Style, segments []Segment, current int,
     i := 0
     for _, s := range strs {
         for _, c := range s.str {
-            style.ValueAt(float32(i) / float32(sizeMax)).Override(s.fg, s.bg).Format(writer, string(c), prevStyle, nextStyle)
+            style.ValueAt(float32(i) / float32(sizeMax)).OverrideFgBg(s.fg, s.bg).Format(writer, string(c), prevStyle, nextStyle)
             i += 1
         }
     }
@@ -88,7 +88,7 @@ type StyleSnapshot interface {
     Format(io.Writer, string, StyleSnapshot, StyleSnapshot)
     GetFg() Color
     GetBg() Color
-    Override(Color, Color) StyleSnapshot
+    OverrideFgBg(Color, Color) StyleSnapshot
 }
 
 
@@ -125,7 +125,7 @@ func (s StyleSnapshotStandard) GetBg() Color {
     return s.bg
 }
 
-func (s StyleSnapshotStandard) Override(fg Color, bg Color) StyleSnapshot {
+func (s StyleSnapshotStandard) OverrideFgBg(fg Color, bg Color) StyleSnapshot {
     var newSs StyleSnapshotStandard = s
     if fg != nil {
         newSs.fg = fg
@@ -174,6 +174,6 @@ func (s StyleSnapshotChameleon) GetBg() Color {
     return nil
 }
 
-func (s StyleSnapshotChameleon) Override(fg Color, bg Color) StyleSnapshot {
+func (s StyleSnapshotChameleon) OverrideFgBg(fg Color, bg Color) StyleSnapshot {
     return s
 }
