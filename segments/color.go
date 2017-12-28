@@ -3,6 +3,7 @@ package segments
 import(
     "io"
     "fmt"
+    "bytes"
     "strconv"
 )
 
@@ -152,7 +153,7 @@ func NewColor(str string) Color {
     case "default"  : return Color4{ 9 }
     }
 
-    panic("cannot parse color");
+    panic("cannot parse color")
 }
 
 
@@ -172,6 +173,19 @@ func ColorizeFn(styles ...Attribute) func(io.Writer, string) {
     }
 }
 
+func ColorizeString(str string, styles ...Attribute) string {
+    return ColorizeStringFn(styles...)(str)
+}
+
+func ColorizeStringFn(styles ...Attribute) func(string) string {
+    return func(str string) string {
+        var buffer bytes.Buffer
+        ColorizeFn(styles...)(&buffer, str)
+        return buffer.String()
+    }
+}
+
+// Background color
 func Bg(c Color) Attribute {
     return func(writer io.Writer) {
         if c == nil {
@@ -181,6 +195,7 @@ func Bg(c Color) Attribute {
     }
 }
 
+// Foreground color
 func Fg(c Color) Attribute {
     return func(writer io.Writer) {
         if c == nil {
@@ -190,14 +205,34 @@ func Fg(c Color) Attribute {
     }
 }
 
+func Reset(writer io.Writer) {
+    escapedPrint(writer, 0)
+}
+
 func Bold(writer io.Writer) {
     escapedPrint(writer, 1)
+}
+
+func Faint(writer io.Writer) {
+    escapedPrint(writer, 2)
+}
+
+func Italic(writer io.Writer) {
+    escapedPrint(writer, 3)
 }
 
 func Underline(writer io.Writer) {
     escapedPrint(writer, 4)
 }
 
-func Reset(writer io.Writer) {
-    escapedPrint(writer, 0)
+func SlowBlink(writer io.Writer) {
+    escapedPrint(writer, 5)
+}
+
+func RapidBlink(writer io.Writer) {
+    escapedPrint(writer, 6)
+}
+
+func Reverse(writer io.Writer) {
+    escapedPrint(writer, 7)
 }
