@@ -64,10 +64,10 @@ func (s ComplexPath) GetStyle(segments []Segment, current int) Style {
     return s.style
 }
 
-func NewComplexPathPlain(style Style, styleUnit Style, separator string, fgSeparator Color, maxDepth uint, ellipsis string) Segment {
+func NewComplexPathPlain(style Style, styleUnit Style, separator string, fgSeparator Color, maxDepth uint, ellipsis string) *ComplexPath {
     return &ComplexPath{ style, styleUnit, true, separator, fgSeparator, maxDepth, ellipsis, []string{} }
 }
 
-func NewComplexPathSplitted(style Style, styleUnit Style, separator string, maxDepth uint, ellipsis string) Segment {
+func NewComplexPathSplitted(style Style, styleUnit Style, separator string, maxDepth uint, ellipsis string) *ComplexPath {
     return &ComplexPath{ style, styleUnit, false, separator, nil, maxDepth, ellipsis, []string{} }
 }

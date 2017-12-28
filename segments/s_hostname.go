@@ -23,6 +23,6 @@ func (s Hostname) GetStyle(segments []Segment, current int) Style {
     return s.style
 }
 
-func NewHostname(style Style) Segment {
+func NewHostname(style Style) *Hostname {
     return &Hostname{ style }
 }
