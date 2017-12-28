@@ -26,6 +26,6 @@ func (s Binding) GetStyle(segments []Segment, current int) Style {
     return s.segment1.GetStyle(segments, current)
 }
 
-func NewBinding(segment1 Segment, segment2 Segment) Segment {
+func NewBinding(segment1 Segment, segment2 Segment) *Binding {
     return &Binding{ segment1, segment2 }
 }

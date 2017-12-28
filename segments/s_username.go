@@ -23,6 +23,6 @@ func (s Username) GetStyle(segments []Segment, current int) Style {
     return s.style
 }
 
-func NewUsername(style Style) Segment {
+func NewUsername(style Style) *Username {
     return &Username{ style }
 }

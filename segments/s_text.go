@@ -25,7 +25,7 @@ func (s Text) GetStyle(segments []Segment, current int) Style {
     return s.style
 }
 
-func NewText(style Style, text string) Segment {
+func NewText(style Style, text string) *Text {
     return &Text{ style, text }
 }
 

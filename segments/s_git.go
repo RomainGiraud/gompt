@@ -104,6 +104,6 @@ func (s Git) GetStyle(segments []Segment, current int) Style {
     return s.style
 }
 
-func NewGit(style Style) Segment {
+func NewGit(style Style) *Git {
     return &Git{ style, "", 0, 0, 0, true }
 }
