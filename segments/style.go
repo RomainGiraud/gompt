@@ -95,11 +95,13 @@ type StyleSnapshot interface {
 type StyleStandard struct {
     Fg Brush
     Bg Brush
+    Bold bool
+    Italic bool
+    Underline bool
 }
 
-type StyleSnapshotStandard struct {
-    fg Color
-    bg Color
+func NewStyleStandard(fg Brush, bg Brush) *StyleStandard {
+    return &StyleStandard{ fg, bg, false, false, false }
 }
 
 func (s StyleStandard) ValueAt(t float32) StyleSnapshot {
@@ -110,11 +112,28 @@ func (s StyleStandard) ValueAt(t float32) StyleSnapshot {
     if s.Bg != nil {
         snapshot.bg = s.Bg.ValueAt(t)
     }
+    if s.Bold {
+        snapshot.attributes = append(snapshot.attributes, Bold)
+    }
+    if s.Italic {
+        snapshot.attributes = append(snapshot.attributes, Italic)
+    }
+    if s.Underline {
+        snapshot.attributes = append(snapshot.attributes, Underline)
+    }
     return snapshot
 }
 
+type StyleSnapshotStandard struct {
+    fg Color
+    bg Color
+    attributes []Attribute
+}
+
 func (s StyleSnapshotStandard) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
-    Colorize(writer, str, Bg(s.bg), Fg(s.fg))
+    s.attributes = append(s.attributes, Bg(s.bg))
+    s.attributes = append(s.attributes, Fg(s.fg))
+    Colorize(writer, str, s.attributes...)
 }
 
 func (s StyleSnapshotStandard) GetFg() Color {
@@ -140,12 +159,15 @@ func (s StyleSnapshotStandard) OverrideFgBg(fg Color, bg Color) StyleSnapshot {
 type StyleChameleon struct {
 }
 
-type StyleSnapshotChameleon struct {
+func NewStyleChameleon(fg Brush, bg Brush) *StyleChameleon {
+    return &StyleChameleon{}
 }
 
 func (s StyleChameleon) ValueAt(t float32) StyleSnapshot {
-    var snapshot StyleSnapshotChameleon
-    return snapshot
+    return StyleSnapshotChameleon{}
+}
+
+type StyleSnapshotChameleon struct {
 }
 
 func (s StyleSnapshotChameleon) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
