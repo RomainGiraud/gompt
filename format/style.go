@@ -1,82 +1,8 @@
-package segments
+package format
 
 import (
 	"io"
-	"unicode/utf8"
 )
-
-func FormatString(writer io.Writer, str string, style Style, segments []Segment, current int) {
-	size := float32(len(str) - 1)
-
-	var prevStyle, nextStyle StyleSnapshot = nil, nil
-
-	if current != 0 {
-		prevStyle = segments[current-1].GetStyle(segments, current-1).ValueAt(1)
-	}
-
-	if (current + 1) < len(segments) {
-		nextStyle = segments[current+1].GetStyle(segments, current+1).ValueAt(0)
-	}
-
-	for i, s := range str {
-		style.ValueAt(float32(i)/size).Format(writer, string(s), prevStyle, nextStyle)
-	}
-}
-
-type PartFormatter struct {
-	str string
-	fg  Color
-	bg  Color
-}
-
-func FormatParts(writer io.Writer, style Style, segments []Segment, current int, strs []PartFormatter) {
-	sizeMax := 0
-	for _, s := range strs {
-		sizeMax += utf8.RuneCountInString(s.str)
-	}
-
-	var prevStyle, nextStyle StyleSnapshot = nil, nil
-
-	if current != 0 {
-		prevStyle = segments[current-1].GetStyle(segments, current-1).ValueAt(1)
-	}
-
-	if (current + 1) < len(segments) {
-		nextStyle = segments[current+1].GetStyle(segments, current+1).ValueAt(0)
-	}
-
-	i := 0
-	for _, s := range strs {
-		for _, c := range s.str {
-			style.ValueAt(float32(i)/float32(sizeMax)).OverrideFgBg(s.fg, s.bg).Format(writer, string(c), prevStyle, nextStyle)
-			i += 1
-		}
-	}
-}
-
-func FormatStringArrayBlock(writer io.Writer, strs []string, style Style, separator string, separatorStyle Style, segments []Segment, current int) {
-	var prevStyle, nextStyle StyleSnapshot = nil, nil
-
-	if current != 0 {
-		prevStyle = segments[current-1].GetStyle(segments, current-1).ValueAt(1)
-	}
-
-	if (current + 1) < len(segments) {
-		nextStyle = segments[current+1].GetStyle(segments, current+1).ValueAt(0)
-	}
-
-	size := float32(len(strs) - 1)
-	for i := 0; i < len(strs)-1; i += 1 {
-		idx := float32(i)
-
-		currentStyle := style.ValueAt(idx / size)
-		currentStyle.Format(writer, strs[i], prevStyle, nextStyle)
-
-		separatorStyle.ValueAt(0).Format(writer, separator, currentStyle, style.ValueAt((idx+1)/size))
-	}
-
-	style.ValueAt(1).Format(writer, strs[len(strs)-1], prevStyle, nextStyle)
-}
 
 type Style interface {
 	ValueAt(t float32) StyleSnapshot

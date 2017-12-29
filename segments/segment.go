@@ -1,6 +1,7 @@
 package segments
 
 import (
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 )
 
@@ -12,7 +13,7 @@ type Arguments struct {
 type Segment interface {
 	Load() []Segment
 	Print(io.Writer, []Segment, int)
-	GetStyle([]Segment, int) Style
+	GetStyle([]Segment, int) format.Style
 }
 
 type SegmentList []Segment

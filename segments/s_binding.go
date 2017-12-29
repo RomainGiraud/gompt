@@ -1,6 +1,7 @@
 package segments
 
 import (
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 )
 
@@ -21,7 +22,7 @@ func (s Binding) Load() []Segment {
 func (s Binding) Print(writer io.Writer, segments []Segment, current int) {
 }
 
-func (s Binding) GetStyle(segments []Segment, current int) Style {
+func (s Binding) GetStyle(segments []Segment, current int) format.Style {
 	return s.segment1.GetStyle(segments, current)
 }
 

@@ -1,12 +1,13 @@
 package segments
 
 import (
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 	"os"
 )
 
 type Hostname struct {
-	style Style
+	style format.Style
 }
 
 func (s Hostname) Load() []Segment {
@@ -18,10 +19,10 @@ func (s Hostname) Print(writer io.Writer, segments []Segment, current int) {
 	FormatString(writer, " "+h+" ", s.style, segments, current)
 }
 
-func (s Hostname) GetStyle(segments []Segment, current int) Style {
+func (s Hostname) GetStyle(segments []Segment, current int) format.Style {
 	return s.style
 }
 
-func NewHostname(style Style) *Hostname {
+func NewHostname(style format.Style) *Hostname {
 	return &Hostname{style}
 }

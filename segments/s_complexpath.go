@@ -1,6 +1,7 @@
 package segments
 
 import (
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 	"log"
 	"os"
@@ -8,11 +9,11 @@ import (
 )
 
 type ComplexPath struct {
-	style       Style
-	styleUnit   Style
+	style       format.Style
+	styleUnit   format.Style
 	isPlain     bool
 	separator   string
-	fgSeparator Color
+	fgSeparator format.Color
 	maxDepth    uint
 	ellipsis    string
 	directories []string
@@ -52,21 +53,21 @@ func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
 		ff = append(ff, PartFormatter{s.directories[len(s.directories)-1], nil, nil})
 		FormatParts(writer, s.style, segments, current, ff)
 	} else {
-		FormatStringArrayBlock(writer, s.directories, s.style, s.separator, StyleChameleon{}, segments, current)
+		FormatStringArrayBlock(writer, s.directories, s.style, s.separator, format.StyleChameleon{}, segments, current)
 	}
 }
 
-func (s ComplexPath) GetStyle(segments []Segment, current int) Style {
+func (s ComplexPath) GetStyle(segments []Segment, current int) format.Style {
 	if !s.isPlain && len(s.directories) == 1 {
 		return s.styleUnit
 	}
 	return s.style
 }
 
-func NewComplexPathPlain(style Style, styleUnit Style, separator string, fgSeparator Color, maxDepth uint, ellipsis string) *ComplexPath {
+func NewComplexPathPlain(style format.Style, styleUnit format.Style, separator string, fgSeparator format.Color, maxDepth uint, ellipsis string) *ComplexPath {
 	return &ComplexPath{style, styleUnit, true, separator, fgSeparator, maxDepth, ellipsis, []string{}}
 }
 
-func NewComplexPathSplitted(style Style, styleUnit Style, separator string, maxDepth uint, ellipsis string) *ComplexPath {
+func NewComplexPathSplitted(style format.Style, styleUnit format.Style, separator string, maxDepth uint, ellipsis string) *ComplexPath {
 	return &ComplexPath{style, styleUnit, false, separator, nil, maxDepth, ellipsis, []string{}}
 }

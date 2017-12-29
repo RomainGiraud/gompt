@@ -1,14 +1,14 @@
 package segments
 
 import (
-	_ "fmt"
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 	"strconv"
 	"strings"
 )
 
 type Git struct {
-	style  Style
+	style  format.Style
 	branch string
 	ahead  int
 	behind int
@@ -17,7 +17,6 @@ type Git struct {
 }
 
 func ParseBranch(str string) (string, int, int) {
-	//fmt.Println("status: ", str)
 	var branch string
 	var ahead, behind int
 
@@ -89,20 +88,20 @@ func (s Git) Print(writer io.Writer, segments []Segment, current int) {
 	if !s.clean || s.stash != 0 {
 		//ff = append(ff, PartFormatter{ "|", nil, nil })
 		if s.stash != 0 {
-			ff = append(ff, PartFormatter{"\uf111", Blue, nil})
+			ff = append(ff, PartFormatter{"\uf111", format.Blue, nil})
 		}
 		if !s.clean {
-			ff = append(ff, PartFormatter{"\uf057", Red, nil})
+			ff = append(ff, PartFormatter{"\uf057", format.Red, nil})
 		}
 	}
 	ff = append(ff, PartFormatter{" ", nil, nil})
 	FormatParts(writer, s.style, segments, current, ff)
 }
 
-func (s Git) GetStyle(segments []Segment, current int) Style {
+func (s Git) GetStyle(segments []Segment, current int) format.Style {
 	return s.style
 }
 
-func NewGit(style Style) *Git {
+func NewGit(style format.Style) *Git {
 	return &Git{style, "", 0, 0, 0, true}
 }
