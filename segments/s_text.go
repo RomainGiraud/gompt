@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+// Text segment is used to print a string.
+// Environment values are expanded:
+//   ${HOME} or $HOME
+// Commands are evaluated:
+// 	 ${cmd> ls -l | wl -l}
+// To display dollar value, double it:
+//   $$
 type Text struct {
 	style format.Style
 	value string
