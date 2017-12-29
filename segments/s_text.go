@@ -1,13 +1,14 @@
 package segments
 
 import (
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 	"os"
 	"strings"
 )
 
 type Text struct {
-	style Style
+	style format.Style
 	value string
 }
 
@@ -20,11 +21,11 @@ func (s Text) Print(writer io.Writer, segments []Segment, current int) {
 	FormatString(writer, text, s.style, segments, current)
 }
 
-func (s Text) GetStyle(segments []Segment, current int) Style {
+func (s Text) GetStyle(segments []Segment, current int) format.Style {
 	return s.style
 }
 
-func NewText(style Style, text string) *Text {
+func NewText(style format.Style, text string) *Text {
 	return &Text{style, text}
 }
 

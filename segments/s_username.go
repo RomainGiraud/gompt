@@ -1,12 +1,13 @@
 package segments
 
 import (
+	"github.com/RomainGiraud/gompt/format"
 	"io"
 	"os/user"
 )
 
 type Username struct {
-	style Style
+	style format.Style
 }
 
 func (s Username) Load() []Segment {
@@ -18,10 +19,10 @@ func (s Username) Print(writer io.Writer, segments []Segment, current int) {
 	FormatString(writer, " "+u.Username+" ", s.style, segments, current)
 }
 
-func (s Username) GetStyle(segments []Segment, current int) Style {
+func (s Username) GetStyle(segments []Segment, current int) format.Style {
 	return s.style
 }
 
-func NewUsername(style Style) *Username {
+func NewUsername(style format.Style) *Username {
 	return &Username{style}
 }

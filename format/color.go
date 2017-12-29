@@ -1,4 +1,4 @@
-package segments
+package format
 
 import (
 	"bytes"
@@ -11,27 +11,6 @@ func escapedPrint(writer io.Writer, a ...interface{}) {
 	fmt.Fprint(writer, "\\[\\e[")
 	fmt.Fprint(writer, a...)
 	fmt.Fprint(writer, "m\\]")
-}
-
-type Brush interface {
-	ValueAt(float32) Color
-}
-
-type UniBrush struct {
-	Color0 Color
-}
-
-func (b UniBrush) ValueAt(t float32) Color {
-	return b.Color0
-}
-
-type GradientBrush struct {
-	Color0 Color
-	Color1 Color
-}
-
-func (b GradientBrush) ValueAt(t float32) Color {
-	return b.Color0.Lerp(b.Color1, t)
 }
 
 type Color interface {
