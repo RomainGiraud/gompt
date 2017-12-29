@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// Git segment displays information about git repository.
+// If current directory is not a repository, do not display anything.
 type Git struct {
 	style  format.Style
 	branch string

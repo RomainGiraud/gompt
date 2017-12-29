@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 )
 
+// Execute a command and return standard output.
 func ExecCommand(name string, arg ...string) string {
 	cmd := exec.Command(name, arg...)
 	var out bytes.Buffer
@@ -20,6 +21,7 @@ func ExecCommand(name string, arg ...string) string {
 	return strings.Trim(out.String(), "\n")
 }
 
+// Format a string with a style.
 func FormatString(writer io.Writer, str string, style format.Style, segments []Segment, current int) {
 	size := float32(len(str) - 1)
 
@@ -38,12 +40,14 @@ func FormatString(writer io.Writer, str string, style format.Style, segments []S
 	}
 }
 
+//
 type PartFormatter struct {
 	str string
 	fg  format.Color
 	bg  format.Color
 }
 
+// Format a string with PartFormatter
 func FormatParts(writer io.Writer, style format.Style, segments []Segment, current int, strs []PartFormatter) {
 	sizeMax := 0
 	for _, s := range strs {

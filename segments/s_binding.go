@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+// Binding segments links two segments.
+// If one of them is empty, none is displayed.
 type Binding struct {
 	segment1 Segment
 	segment2 Segment

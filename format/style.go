@@ -4,17 +4,25 @@ import (
 	"io"
 )
 
+// Style is an interface that store a format.
+// A snapshot can be extracted at a given percent.
 type Style interface {
 	ValueAt(t float32) StyleSnapshot
 }
 
+// StyleSnapshot represents an extract of a Style at a given percent.
 type StyleSnapshot interface {
+	// Format a string
 	Format(io.Writer, string, StyleSnapshot, StyleSnapshot)
+	// Return foreground
 	GetFg() Color
+	// Return background
 	GetBg() Color
+	// Replace foreground and/or background
 	OverrideFgBg(Color, Color) StyleSnapshot
 }
 
+// Most basic style.
 type StyleStandard struct {
 	Fg        Brush
 	Bg        Brush
@@ -23,6 +31,7 @@ type StyleStandard struct {
 	Underline bool
 }
 
+// Create a StyleStandard.
 func NewStyleStandard(fg Brush, bg Brush) *StyleStandard {
 	return &StyleStandard{fg, bg, false, false, false}
 }
@@ -56,7 +65,7 @@ type StyleSnapshotStandard struct {
 func (s StyleSnapshotStandard) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
 	s.attributes = append(s.attributes, Bg(s.bg))
 	s.attributes = append(s.attributes, Fg(s.fg))
-	Colorize(writer, str, s.attributes...)
+	Fformat(writer, str, s.attributes...)
 }
 
 func (s StyleSnapshotStandard) GetFg() Color {
@@ -78,9 +87,11 @@ func (s StyleSnapshotStandard) OverrideFgBg(fg Color, bg Color) StyleSnapshot {
 	return newSs
 }
 
+// StyleChameleon can be used with Powerline Font separtors.
 type StyleChameleon struct {
 }
 
+// Create a StyleChameleon.
 func NewStyleChameleon(fg Brush, bg Brush) *StyleChameleon {
 	return &StyleChameleon{}
 }
@@ -107,7 +118,7 @@ func (s StyleSnapshotChameleon) Format(writer io.Writer, str string, prev StyleS
 		}
 	}
 
-	Colorize(writer, str, Bg(bg), Fg(fg))
+	Fformat(writer, str, Bg(bg), Fg(fg))
 }
 
 func (s StyleSnapshotChameleon) GetFg() Color {

@@ -5,19 +5,18 @@ import (
 	"io"
 )
 
-type Arguments struct {
-	Status     int
-	ConfigPath string
-}
-
+// Represent a module of the prompt.
+// The segment must be loaded first before printing.
 type Segment interface {
 	Load() []Segment
 	Print(io.Writer, []Segment, int)
 	GetStyle([]Segment, int) format.Style
 }
 
+// A list of segments.
 type SegmentList []Segment
 
+// Load then render segments.
 func (segments *SegmentList) Render(writer io.Writer) {
 	if len(*segments) == 0 {
 		panic("Empty prompt")

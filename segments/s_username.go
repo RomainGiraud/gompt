@@ -6,6 +6,8 @@ import (
 	"os/user"
 )
 
+// Username segment displays the current user.
+// It can be simulated by a Text segment and environment variable.
 type Username struct {
 	style format.Style
 }

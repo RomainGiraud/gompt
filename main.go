@@ -30,7 +30,7 @@ func main() {
 		segments.NewText(format.StyleChameleon{}, "\ue0b0"),
 		segments.NewHostname(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})),
 		segments.NewText(format.StyleChameleon{}, "\ue0b0"),
-		segments.NewComplexPathSplitted(
+		segments.NewCurrentDirSplitted(
 			format.NewStyleStandard(
 				format.UniBrush{format.NewColor("#333")},
 				format.GradientBrush{format.NewColor("#aaa"), format.NewColor("#eee")}),

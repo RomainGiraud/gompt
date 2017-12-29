@@ -7,26 +7,29 @@ import (
 	"strconv"
 )
 
-func escapedPrint(writer io.Writer, a ...interface{}) {
-	fmt.Fprint(writer, "\\[\\e[")
-	fmt.Fprint(writer, a...)
-	fmt.Fprint(writer, "m\\]")
+// Print escaped attribute.
+func escapedPrint(w io.Writer, a ...interface{}) {
+	fmt.Fprint(w, "\\[\\e[")
+	fmt.Fprint(w, a...)
+	fmt.Fprint(w, "m\\]")
 }
 
+// Color is the interface that represents any color type
 type Color interface {
-	Fprintf(writer io.Writer, fg bool)
+	Fprintf(io.Writer, bool)
 	Lerp(Color, float32) Color
 }
 
+// Color4 represents a named color in 8 available.
 type Color4 struct {
 	value uint8
 }
 
-func (c Color4) Fprintf(writer io.Writer, fg bool) {
+func (c Color4) Fprintf(w io.Writer, fg bool) {
 	if fg {
-		escapedPrint(writer, 30+c.value)
+		escapedPrint(w, 30+c.value)
 	} else {
-		escapedPrint(writer, 40+c.value)
+		escapedPrint(w, 40+c.value)
 	}
 }
 
@@ -39,15 +42,16 @@ func (c Color4) Lerp(other Color, t float32) Color {
 	}
 }
 
+// Color8 represents a height bits color.
 type Color8 struct {
 	value uint8
 }
 
-func (c Color8) Fprintf(writer io.Writer, fg bool) {
+func (c Color8) Fprintf(w io.Writer, fg bool) {
 	if fg {
-		escapedPrint(writer, "38;5;", c.value)
+		escapedPrint(w, "38;5;", c.value)
 	} else {
-		escapedPrint(writer, "48;5;", c.value)
+		escapedPrint(w, "48;5;", c.value)
 	}
 }
 
@@ -60,15 +64,16 @@ func (c Color8) Lerp(other Color, t float32) Color {
 	}
 }
 
+// Color24 represents a true color in 24 bits format.
 type Color24 struct {
 	r, g, b uint8
 }
 
-func (c Color24) Fprintf(writer io.Writer, fg bool) {
+func (c Color24) Fprintf(w io.Writer, fg bool) {
 	if fg {
-		escapedPrint(writer, "38;2;", c.r, ";", c.g, ";", c.b)
+		escapedPrint(w, "38;2;", c.r, ";", c.g, ";", c.b)
 	} else {
-		escapedPrint(writer, "48;2;", c.r, ";", c.g, ";", c.b)
+		escapedPrint(w, "48;2;", c.r, ";", c.g, ";", c.b)
 	}
 }
 
@@ -85,6 +90,7 @@ func (c Color24) Lerp(other Color, t float32) Color {
 	}
 }
 
+// Named color
 var (
 	Black   = Color4{0}
 	Red     = Color4{1}
@@ -97,6 +103,11 @@ var (
 	Default = Color4{9}
 )
 
+// Construct a color from a string.
+//   format.NewColor("black")
+//   format.NewColor("250")
+//   format.NewColor("#f0f")
+//   format.NewColor("#ff00ff")
 func NewColor(str string) Color {
 	if i, err := strconv.Atoi(str); err == nil {
 		return Color8{uint8(i)}
@@ -140,82 +151,95 @@ func NewColor(str string) Color {
 	panic("cannot parse color")
 }
 
+// Attribute is a type that represents a terminal ANSI escape code.
 type Attribute func(io.Writer)
 
-func Colorize(writer io.Writer, str string, styles ...Attribute) {
-	ColorizeFn(styles...)(writer, str)
+// Fformat formats the string surrounded by attributes and writes it to w.
+func Fformat(w io.Writer, s string, a ...Attribute) {
+	FformatFn(a...)(w, s)
 }
 
-func ColorizeFn(styles ...Attribute) func(io.Writer, string) {
-	return func(writer io.Writer, str string) {
-		defer Reset(writer)
-		for _, style := range styles {
-			style(writer)
+// FformatFn returns a method to format a string.
+func FformatFn(a ...Attribute) func(io.Writer, string) {
+	return func(w io.Writer, s string) {
+		defer Reset(w)
+		for _, style := range a {
+			style(w)
 		}
-		io.WriteString(writer, str)
+		io.WriteString(w, s)
 	}
 }
 
-func ColorizeString(str string, styles ...Attribute) string {
-	return ColorizeStringFn(styles...)(str)
+// Format returns a formatted string surrounded by attributes.
+func Format(s string, a ...Attribute) string {
+	return FormatFn(a...)(s)
 }
 
-func ColorizeStringFn(styles ...Attribute) func(string) string {
-	return func(str string) string {
-		var buffer bytes.Buffer
-		ColorizeFn(styles...)(&buffer, str)
-		return buffer.String()
+// FormatFn returns a method to format a string.
+func FormatFn(a ...Attribute) func(string) string {
+	return func(s string) string {
+		var b bytes.Buffer
+		FformatFn(a...)(&b, s)
+		return b.String()
 	}
 }
 
-// Background color
+// Set background color.
 func Bg(c Color) Attribute {
-	return func(writer io.Writer) {
+	return func(w io.Writer) {
 		if c == nil {
 			return
 		}
-		c.Fprintf(writer, false)
+		c.Fprintf(w, false)
 	}
 }
 
-// Foreground color
+// Set foreground color.
 func Fg(c Color) Attribute {
-	return func(writer io.Writer) {
+	return func(w io.Writer) {
 		if c == nil {
 			return
 		}
-		c.Fprintf(writer, true)
+		c.Fprintf(w, true)
 	}
 }
 
-func Reset(writer io.Writer) {
-	escapedPrint(writer, 0)
+// Reset all attributes.
+func Reset(w io.Writer) {
+	escapedPrint(w, 0)
 }
 
-func Bold(writer io.Writer) {
-	escapedPrint(writer, 1)
+// Set bold.
+func Bold(w io.Writer) {
+	escapedPrint(w, 1)
 }
 
-func Faint(writer io.Writer) {
-	escapedPrint(writer, 2)
+// Set faint.
+func Faint(w io.Writer) {
+	escapedPrint(w, 2)
 }
 
-func Italic(writer io.Writer) {
-	escapedPrint(writer, 3)
+// Set italic.
+func Italic(w io.Writer) {
+	escapedPrint(w, 3)
 }
 
-func Underline(writer io.Writer) {
-	escapedPrint(writer, 4)
+// Set underline.
+func Underline(w io.Writer) {
+	escapedPrint(w, 4)
 }
 
-func SlowBlink(writer io.Writer) {
-	escapedPrint(writer, 5)
+// Set a slow blink.
+func SlowBlink(w io.Writer) {
+	escapedPrint(w, 5)
 }
 
-func RapidBlink(writer io.Writer) {
-	escapedPrint(writer, 6)
+// Set a rapid blink.
+func RapidBlink(w io.Writer) {
+	escapedPrint(w, 6)
 }
 
-func Reverse(writer io.Writer) {
-	escapedPrint(writer, 7)
+// Reverse foreground and background colors.
+func Reverse(w io.Writer) {
+	escapedPrint(w, 7)
 }

@@ -8,7 +8,8 @@ import (
 	"strings"
 )
 
-type ComplexPath struct {
+// CurrentDir segment display current working directory.
+type CurrentDir struct {
 	style       format.Style
 	styleUnit   format.Style
 	isPlain     bool
@@ -19,7 +20,7 @@ type ComplexPath struct {
 	directories []string
 }
 
-func (s ComplexPath) Load() []Segment {
+func (s CurrentDir) Load() []Segment {
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +40,7 @@ func (s ComplexPath) Load() []Segment {
 	return []Segment{s}
 }
 
-func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
+func (s CurrentDir) Print(writer io.Writer, segments []Segment, current int) {
 	for i, v := range s.directories {
 		s.directories[i] = " " + v + " "
 	}
@@ -57,17 +58,21 @@ func (s ComplexPath) Print(writer io.Writer, segments []Segment, current int) {
 	}
 }
 
-func (s ComplexPath) GetStyle(segments []Segment, current int) format.Style {
+func (s CurrentDir) GetStyle(segments []Segment, current int) format.Style {
 	if !s.isPlain && len(s.directories) == 1 {
 		return s.styleUnit
 	}
 	return s.style
 }
 
-func NewComplexPathPlain(style format.Style, styleUnit format.Style, separator string, fgSeparator format.Color, maxDepth uint, ellipsis string) *ComplexPath {
-	return &ComplexPath{style, styleUnit, true, separator, fgSeparator, maxDepth, ellipsis, []string{}}
+// Create a CurrentDir segment with a unique style for all path.
+// Separators are simple string.
+func NewCurrentDirPlain(style format.Style, styleUnit format.Style, separator string, fgSeparator format.Color, maxDepth uint, ellipsis string) *CurrentDir {
+	return &CurrentDir{style, styleUnit, true, separator, fgSeparator, maxDepth, ellipsis, []string{}}
 }
 
-func NewComplexPathSplitted(style format.Style, styleUnit format.Style, separator string, maxDepth uint, ellipsis string) *ComplexPath {
-	return &ComplexPath{style, styleUnit, false, separator, nil, maxDepth, ellipsis, []string{}}
+// Create a CurrentDir segment by spliting each directory and apply a style to it.
+// Separators are transition characters.
+func NewCurrentDirSplitted(style format.Style, styleUnit format.Style, separator string, maxDepth uint, ellipsis string) *CurrentDir {
+	return &CurrentDir{style, styleUnit, false, separator, nil, maxDepth, ellipsis, []string{}}
 }

@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// Hostname segment displays the machine hostname.
+// It can be simulated by a Text segment and environment variable.
 type Hostname struct {
 	style format.Style
 }
