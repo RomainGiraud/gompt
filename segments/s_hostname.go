@@ -2,29 +2,15 @@ package segments
 
 import (
 	"github.com/RomainGiraud/gompt/format"
-	"io"
 	"os"
 )
 
-// Hostname segment displays the machine hostname.
-// It can be simulated by a Text segment and environment variable.
-type Hostname struct {
-	style format.Style
+// HostnameLoader create a segment containing the machine hostname.
+type HostnameLoader struct {
+	Style format.Style
 }
 
-func (s Hostname) Load() []Segment {
-	return []Segment{s}
-}
-
-func (s Hostname) Print(writer io.Writer, segments []Segment, current int) {
+func (s HostnameLoader) Load() []Segment {
 	h, _ := os.Hostname()
-	FormatString(writer, " "+h+" ", s.style, segments, current)
-}
-
-func (s Hostname) GetStyle(segments []Segment, current int) format.Style {
-	return s.style
-}
-
-func NewHostname(style format.Style) *Hostname {
-	return &Hostname{style}
+	return []Segment{Text{s.Style, " " + h + " "}}
 }

@@ -7,33 +7,21 @@ import (
 	"strings"
 )
 
-// Text segment is used to print a string.
+// TextLoader loads a Text segment and interprets some characters.
 // Environment values are expanded:
 //   ${HOME} or $HOME
 // Commands are evaluated:
 // 	 ${cmd> ls -l | wl -l}
 // To display dollar value, double it:
 //   $$
-type Text struct {
-	style format.Style
-	value string
+type TextLoader struct {
+	Style format.Style
+	Value string
 }
 
-func (s Text) Load() []Segment {
-	return []Segment{s}
-}
-
-func (s Text) Print(writer io.Writer, segments []Segment, current int) {
-	text := os.Expand(s.value, getenv)
-	FormatString(writer, text, s.style, segments, current)
-}
-
-func (s Text) GetStyle(segments []Segment, current int) format.Style {
-	return s.style
-}
-
-func NewText(style format.Style, text string) *Text {
-	return &Text{style, text}
+func (s TextLoader) Load() []Segment {
+	text := os.Expand(s.Value, getenv)
+	return []Segment{Text{s.Style, text}}
 }
 
 func getenv(key string) string {
@@ -48,4 +36,18 @@ func getenv(key string) string {
 	}
 
 	return os.Getenv(key)
+}
+
+// Text segment is used to print a stylized string.
+type Text struct {
+	style format.Style
+	text  string
+}
+
+func (s Text) Print(writer io.Writer, segments []Segment, current int) {
+	FormatString(writer, s.text, s.style, segments, current)
+}
+
+func (s Text) GetStyle(segments []Segment, current int) format.Style {
+	return s.style
 }

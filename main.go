@@ -24,28 +24,28 @@ func main() {
 			format.UniBrush{format.NewColor("8")})
 	}
 
-	segmentList := segments.SegmentList{
-		segments.NewText(exitStatusStyle, "\uf444"),
-		segments.NewUsername(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})),
-		segments.NewText(format.StyleChameleon{}, "\ue0b0"),
-		segments.NewHostname(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})),
-		segments.NewText(format.StyleChameleon{}, "\ue0b0"),
-		segments.NewCurrentDirSplitted(
+	prompt := segments.LoaderList{
+		segments.TextLoader{exitStatusStyle, "\uf444"},
+		segments.UsernameLoader{format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})},
+		segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
+		segments.HostnameLoader{format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})},
+		segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
+		segments.CurrentDirBlockLoader{
 			format.NewStyleStandard(
 				format.UniBrush{format.NewColor("#333")},
 				format.GradientBrush{format.NewColor("#aaa"), format.NewColor("#eee")}),
 			format.NewStyleStandard(
 				format.UniBrush{format.NewColor("#333")},
 				format.UniBrush{format.NewColor("#eee")}),
-			"\ue0b4", 3, "\u2026"),
-		segments.NewBinding(
-			segments.NewText(format.StyleChameleon{}, "\ue0b0"),
-			segments.NewGit(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan}))),
-		segments.NewText(format.StyleChameleon{}, "\ue0b0"),
-		segments.NewText(format.NewStyleStandard(format.UniBrush{}, format.UniBrush{}), " "),
+			"\ue0b4", 3, "\u2026"},
+		segments.BindingLoader{
+			segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
+			segments.GitLoader{format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan})}},
+		segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
+		segments.TextLoader{format.NewStyleStandard(format.UniBrush{}, format.UniBrush{}), " "},
 	}
 
 	var buffer bytes.Buffer
-	segmentList.Render(&buffer)
+	prompt.Load().Render(&buffer)
 	fmt.Println(buffer.String())
 }

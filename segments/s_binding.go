@@ -1,33 +1,17 @@
 package segments
 
-import (
-	"github.com/RomainGiraud/gompt/format"
-	"io"
-)
-
-// Binding segments links two segments.
+// BindingLoader links two segment loaders.
 // If one of them is empty, none is displayed.
-type Binding struct {
-	segment1 Segment
-	segment2 Segment
+type BindingLoader struct {
+	Segment1 SegmentLoader
+	Segment2 SegmentLoader
 }
 
-func (s Binding) Load() []Segment {
-	s1 := s.segment1.Load()
-	s2 := s.segment2.Load()
+func (s BindingLoader) Load() []Segment {
+	s1 := s.Segment1.Load()
+	s2 := s.Segment2.Load()
 	if len(s1) == 0 || len(s2) == 0 {
 		return []Segment{}
 	}
 	return append(s1, s2...)
-}
-
-func (s Binding) Print(writer io.Writer, segments []Segment, current int) {
-}
-
-func (s Binding) GetStyle(segments []Segment, current int) format.Style {
-	return s.segment1.GetStyle(segments, current)
-}
-
-func NewBinding(segment1 Segment, segment2 Segment) *Binding {
-	return &Binding{segment1, segment2}
 }
