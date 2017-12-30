@@ -40,14 +40,14 @@ func FormatString(writer io.Writer, str string, style format.Style, segments []S
 	}
 }
 
-//
+// Used to format elements with different styles.
 type PartFormatter struct {
 	str string
 	fg  format.Color
 	bg  format.Color
 }
 
-// Format a string with PartFormatter
+// Format a string with PartFormatter.
 func FormatParts(writer io.Writer, style format.Style, segments []Segment, current int, strs []PartFormatter) {
 	sizeMax := 0
 	for _, s := range strs {
@@ -73,6 +73,7 @@ func FormatParts(writer io.Writer, style format.Style, segments []Segment, curre
 	}
 }
 
+// Format a list of strings.
 func FormatStringArrayBlock(writer io.Writer, strs []string, style format.Style, separator string, separatorStyle format.Style, segments []Segment, current int) {
 	var prevStyle, nextStyle format.StyleSnapshot = nil, nil
 

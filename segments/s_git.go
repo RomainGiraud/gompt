@@ -7,18 +7,28 @@ import (
 	"strings"
 )
 
-// Git segment displays information about git repository.
+// GitLoader displays information about git repository.
 // If current directory is not a repository, do not display anything.
-type Git struct {
-	style  format.Style
-	branch string
-	ahead  int
-	behind int
-	stash  int
-	clean  bool
+type GitLoader struct {
+	Style format.Style
 }
 
-func ParseBranch(str string) (string, int, int) {
+func (s GitLoader) Load() []Segment {
+	statusOutput := ExecCommand("git", "status", "--porcelain", "--branch")
+	if len(statusOutput) == 0 {
+		return []Segment{}
+	}
+
+	status := strings.Split(statusOutput, "\n")
+
+	branch, ahead, behind := parseBranch(status[0])
+	clean := (len(status[1:]) == 0)
+	stash := getStashCount()
+
+	return []Segment{git{s.Style, branch, ahead, behind, stash, clean}}
+}
+
+func parseBranch(str string) (string, int, int) {
 	var branch string
 	var ahead, behind int
 
@@ -52,7 +62,7 @@ func ParseBranch(str string) (string, int, int) {
 	return branch, ahead, behind
 }
 
-func GetStashCount() int {
+func getStashCount() int {
 	stashOutput := ExecCommand("git", "stash", "list")
 	if len(stashOutput) == 0 {
 		return 0
@@ -61,22 +71,16 @@ func GetStashCount() int {
 	return len(strings.Split(stashOutput, "\n"))
 }
 
-func (s Git) Load() []Segment {
-	statusOutput := ExecCommand("git", "status", "--porcelain", "--branch")
-	if len(statusOutput) == 0 {
-		return []Segment{}
-	}
-
-	status := strings.Split(statusOutput, "\n")
-
-	s.branch, s.ahead, s.behind = ParseBranch(status[0])
-	s.clean = (len(status[1:]) == 0)
-	s.stash = GetStashCount()
-
-	return []Segment{s}
+type git struct {
+	style  format.Style
+	branch string
+	ahead  int
+	behind int
+	stash  int
+	clean  bool
 }
 
-func (s Git) Print(writer io.Writer, segments []Segment, current int) {
+func (s git) Print(writer io.Writer, segments []Segment, current int) {
 	ff := []PartFormatter{
 		PartFormatter{" ", nil, nil},
 		PartFormatter{s.branch, nil, nil},
@@ -100,10 +104,7 @@ func (s Git) Print(writer io.Writer, segments []Segment, current int) {
 	FormatParts(writer, s.style, segments, current, ff)
 }
 
-func (s Git) GetStyle(segments []Segment, current int) format.Style {
+func (s git) GetStyle(segments []Segment, current int) format.Style {
 	return s.style
 }
 
-func NewGit(style format.Style) *Git {
-	return &Git{style, "", 0, 0, 0, true}
-}

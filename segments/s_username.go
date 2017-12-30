@@ -2,29 +2,15 @@ package segments
 
 import (
 	"github.com/RomainGiraud/gompt/format"
-	"io"
 	"os/user"
 )
 
-// Username segment displays the current user.
-// It can be simulated by a Text segment and environment variable.
-type Username struct {
-	style format.Style
+// UsernameLoader create a segment containing the current username.
+type UsernameLoader struct {
+	Style format.Style
 }
 
-func (s Username) Load() []Segment {
-	return []Segment{s}
-}
-
-func (s Username) Print(writer io.Writer, segments []Segment, current int) {
+func (s UsernameLoader) Load() []Segment {
 	u, _ := user.Current()
-	FormatString(writer, " "+u.Username+" ", s.style, segments, current)
-}
-
-func (s Username) GetStyle(segments []Segment, current int) format.Style {
-	return s.style
-}
-
-func NewUsername(style format.Style) *Username {
-	return &Username{style}
+	return []Segment{Text{s.Style, " " + u.Username + " "}}
 }
