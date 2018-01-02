@@ -115,14 +115,18 @@ func NewColor(str string) Color {
 
 	if str[0] == '#' {
 		var r, g, b uint64
+		var err error
 		if len(str) == 4 {
-			r, _ = strconv.ParseUint(str[1:2]+str[1:2], 16, 8)
-			g, _ = strconv.ParseUint(str[2:3]+str[2:3], 16, 8)
-			b, _ = strconv.ParseUint(str[3:4]+str[3:4], 16, 8)
+			r, err = strconv.ParseUint(str[1:2]+str[1:2], 16, 8)
+			g, err = strconv.ParseUint(str[2:3]+str[2:3], 16, 8)
+			b, err = strconv.ParseUint(str[3:4]+str[3:4], 16, 8)
 		} else if len(str) == 7 {
-			r, _ = strconv.ParseUint(str[1:3], 16, 8)
-			g, _ = strconv.ParseUint(str[3:5], 16, 8)
-			b, _ = strconv.ParseUint(str[5:7], 16, 8)
+			r, err = strconv.ParseUint(str[1:3], 16, 8)
+			g, err = strconv.ParseUint(str[3:5], 16, 8)
+			b, err = strconv.ParseUint(str[5:7], 16, 8)
+		}
+		if err != nil {
+			panic("Error during color parsing: " + err.Error())
 		}
 		return Color24{uint8(r), uint8(g), uint8(b)}
 	}

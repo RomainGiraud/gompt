@@ -32,7 +32,11 @@ func getenv(key string) string {
 
 	// Execute "my_command" from ${cmd> my_command}
 	if strings.HasPrefix(key, "cmd> ") {
-		return ExecCommand("bash", "-c", key[5:])
+		output, err := ExecCommand("bash", "-c", key[5:])
+		if err != nil {
+			return ""
+		}
+		return output
 	}
 
 	return os.Getenv(key)

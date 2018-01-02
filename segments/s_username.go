@@ -11,6 +11,9 @@ type UsernameLoader struct {
 }
 
 func (s UsernameLoader) Load() []Segment {
-	u, _ := user.Current()
+	u, err := user.Current()
+	if err != nil {
+		return []Segment{}
+	}
 	return []Segment{Text{s.Style, " " + u.Username + " "}}
 }
