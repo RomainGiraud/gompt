@@ -11,6 +11,9 @@ type HostnameLoader struct {
 }
 
 func (s HostnameLoader) Load() []Segment {
-	h, _ := os.Hostname()
+	h, err := os.Hostname()
+	if err != nil {
+		return []Segment{}
+	}
 	return []Segment{Text{s.Style, " " + h + " "}}
 }

@@ -10,15 +10,15 @@ import (
 )
 
 // Execute a command and return standard output.
-func ExecCommand(name string, arg ...string) string {
+func ExecCommand(name string, arg ...string) (string, error) {
 	cmd := exec.Command(name, arg...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		return ""
+		return "", err
 	}
-	return strings.Trim(out.String(), "\n")
+	return strings.Trim(out.String(), "\n"), nil
 }
 
 // Format a string with a style.

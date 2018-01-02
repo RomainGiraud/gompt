@@ -14,8 +14,8 @@ type GitLoader struct {
 }
 
 func (s GitLoader) Load() []Segment {
-	statusOutput := ExecCommand("git", "status", "--porcelain", "--branch")
-	if len(statusOutput) == 0 {
+	statusOutput, err := ExecCommand("git", "status", "--porcelain", "--branch")
+	if err != nil {
 		return []Segment{}
 	}
 
@@ -63,11 +63,15 @@ func parseBranch(str string) (string, int, int) {
 }
 
 func getStashCount() int {
-	stashOutput := ExecCommand("git", "stash", "list")
-	if len(stashOutput) == 0 {
+	stashOutput, err := ExecCommand("git", "stash", "list")
+	if err != nil {
 		return 0
 	}
 
+	stashOutput = strings.TrimSpace(stashOutput)
+	if len(stashOutput) == 0 {
+		return 0
+	}
 	return len(strings.Split(stashOutput, "\n"))
 }
 
