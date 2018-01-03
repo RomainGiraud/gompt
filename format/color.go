@@ -2,6 +2,7 @@ package format
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -124,6 +125,8 @@ func NewColor(str string) Color {
 			r, err = strconv.ParseUint(str[1:3], 16, 8)
 			g, err = strconv.ParseUint(str[3:5], 16, 8)
 			b, err = strconv.ParseUint(str[5:7], 16, 8)
+		} else {
+			err = errors.New("invalid length for color parsing")
 		}
 		if err != nil {
 			panic("Error during color parsing: " + err.Error())
