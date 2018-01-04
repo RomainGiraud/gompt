@@ -7,9 +7,12 @@ import (
 
 // A segment is a displayed element of the prompt.
 type Segment interface {
+	// Initialize hidden elements of segment
 	Load()
-	Print(io.Writer, []Segment, int)
-	GetStyle([]Segment, int) format.Style
+	// Print segment i in w. All segments are in s.
+	Print(w io.Writer, s []Segment, i int)
+	// Return style of segment i. All segments are in s.
+	GetStyle(s []Segment, i int) format.Style
 }
 
 // A list of segments.
