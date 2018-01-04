@@ -32,11 +32,7 @@ func (s *CurrentDirBlock) Load() {
 }
 
 func (s CurrentDirBlock) Print(writer io.Writer, segments []Segment, current int) {
-	style := s.Style
-	if len(s.directories) == 1 {
-		style = s.StyleUnit
-	}
-	FormatStringArrayBlock(writer, s.directories, style, s.Separator, format.StyleChameleon{}, segments, current)
+	FormatStringArrayBlock(writer, s.directories, s.GetStyle(segments, current), s.Separator, format.StyleChameleon{}, segments, current)
 }
 
 func (s CurrentDirBlock) GetStyle(segments []Segment, current int) format.Style {

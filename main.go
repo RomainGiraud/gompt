@@ -28,10 +28,22 @@ func main() {
 
 	var prompt segments.SegmentList
 	prompt = append(prompt, segments.NewTextStylized("\uf444", exitStatusStyle))
-	prompt = append(prompt, segments.NewUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})))
+	prompt = append(prompt, segments.NewFullUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})))
 	prompt = append(prompt, sep)
-	prompt = append(prompt, segments.NewHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})))
+	prompt = append(prompt, segments.NewFullHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})))
 	prompt = append(prompt, sep)
+
+	venv := segments.NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Yellow}))
+	if venv != nil {
+		prompt = append(prompt, venv)
+		prompt = append(prompt, sep)
+	}
+
+	direnv := segments.NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Magenta}))
+	if direnv != nil {
+		prompt = append(prompt, direnv)
+		prompt = append(prompt, sep)
+	}
 
 	cwd := segments.NewCurrentDirBlock()
 	cwd.Style = format.NewStyleStandard(
