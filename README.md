@@ -81,14 +81,15 @@ In the future, I will try to create a tool to generate configuration (maybe anot
 In general, a segment has a style (can have more) and always output a string.
 
 For now, following segments are available:
-- `ComplexPath` - current path with different options
+- `CurrentDir` - current path with different options
+- `Git` - repository information
 - `Hostname` - machine's hostname
 - `Text` - preprocessed text: environment variable `${ENV}` and external command `${$cmd> ls}`.
 - `Username` - current logged-in username
 
 `Text` is one of the main segment, you can do lots of things just with this one:
 - separator between segments
-- replace `Hostname` and `Username` (with environment variable or command)
+- replace `Hostname` and `Username` segments (with environment variable or command)
 
 ### Styles
 
@@ -108,11 +109,11 @@ A brush stores one or more colors.
 ### Colors
 
 Colors can be specified in three formats:
-- named colors: `Black`, `Red`, `Green`, `Yellow`, `Blue`, `Magenta`, `Cyan`, `White` and `Default`
+- named colors: `Black`, `Red`, `Green`, `Yellow`, `Blue`, `Magenta`, `Cyan` and `White`
 - 256 color lookup table: integer between 0 and 255 (named colors are at the beginning of this table)
 - true colors: in hexadecimal format `#f0f` or `#ff00ff`.
 
-Interesting link: [ANSI escape code](https://en.wikipedia.org/wiki/ANSI_escape_code).
+Usefull link: [ANSI escape code](https://en.wikipedia.org/wiki/ANSI_escape_code).
 
 
 ## Miscellaneous
@@ -148,7 +149,7 @@ Reading a configuration file at each display is useless.
 Generally, you do not change your configuration each seconds.
 
 A possible solution is to cache the parsing of configuration.
-But, for the moment, this is not the priority.
+For the moment, this is not the priority.
 
 **Why does not GradientBrush work with named color?**
 

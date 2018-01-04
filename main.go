@@ -24,28 +24,37 @@ func main() {
 			format.UniBrush{format.NewColor("8")})
 	}
 
-	prompt := segments.LoaderList{
-		segments.TextLoader{exitStatusStyle, "\uf444"},
-		segments.UsernameLoader{format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})},
-		segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
-		segments.HostnameLoader{format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})},
-		segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
-		segments.CurrentDirBlockLoader{
-			format.NewStyleStandard(
-				format.UniBrush{format.NewColor("#333")},
-				format.GradientBrush{format.NewColor("#aaa"), format.NewColor("#eee")}),
-			format.NewStyleStandard(
-				format.UniBrush{format.NewColor("#333")},
-				format.UniBrush{format.NewColor("#eee")}),
-			"\ue0b4", 3, "\u2026"},
-		segments.BindingLoader{
-			segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
-			segments.GitLoader{format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan})}},
-		segments.TextLoader{format.StyleChameleon{}, "\ue0b0"},
-		segments.TextLoader{format.NewStyleStandard(format.UniBrush{}, format.UniBrush{}), " "},
+	sep := segments.NewTextStylized("\ue0b0", format.NewStyleChameleon())
+
+	var prompt segments.SegmentList
+	prompt = append(prompt, segments.NewTextStylized("\uf444", exitStatusStyle))
+	prompt = append(prompt, segments.NewUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})))
+	prompt = append(prompt, sep)
+	prompt = append(prompt, segments.NewHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})))
+	prompt = append(prompt, sep)
+
+	cwd := segments.NewCurrentDirBlock()
+	cwd.Style = format.NewStyleStandard(
+		format.UniBrush{format.NewColor("#333")},
+		format.GradientBrush{format.NewColor("#aaa"), format.NewColor("#eee")})
+	cwd.StyleUnit = format.NewStyleStandard(
+		format.UniBrush{format.NewColor("#333")},
+		format.UniBrush{format.NewColor("#eee")})
+	cwd.Separator = "\ue0b4"
+	cwd.MaxDepth = 3
+	prompt = append(prompt, cwd)
+
+	if git := segments.NewGit(); git != nil {
+		prompt = append(prompt, sep)
+
+		git.Style = format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan})
+		prompt = append(prompt, git)
 	}
 
+	prompt = append(prompt, sep)
+	prompt = append(prompt, segments.NewText(" "))
+
 	var buffer bytes.Buffer
-	prompt.Load().Render(&buffer)
+	prompt.Render(&buffer)
 	fmt.Println(buffer.String())
 }
