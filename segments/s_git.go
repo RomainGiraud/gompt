@@ -7,25 +7,80 @@ import (
 	"strings"
 )
 
-// GitLoader displays information about git repository.
-// If current directory is not a repository, do not display anything.
-type GitLoader struct {
-	Style format.Style
+// Git segment prints git information.
+type Git struct {
+	Style        format.Style
+	AheadSymbol  string
+	AheadColor   format.Color
+	BehindSymbol string
+	BehindColor  format.Color
+	StashSymbol  string
+	StashColor   format.Color
+	DirtySymbol  string
+	DirtyColor   format.Color
+	branch       string
+	ahead        int
+	behind       int
+	stash        int
+	clean        bool
 }
 
-func (s GitLoader) Load() []Segment {
+// Create a Git segment.
+func NewGit() *Git {
+	// in a repository?
+	_, err := ExecCommand("git", "status")
+	if err != nil {
+		return nil
+	}
+
+	return &Git{
+		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
+		"\uf139", format.Black,
+		"\uf13a", format.Black,
+		"\uf024", format.Black,
+		"\uf057", format.Red,
+		"", 0, 0, 0, true}
+}
+
+func (s *Git) Load() {
 	statusOutput, err := ExecCommand("git", "status", "--porcelain", "--branch")
 	if err != nil {
-		return []Segment{}
+		return
 	}
 
 	status := strings.Split(statusOutput, "\n")
 
-	branch, ahead, behind := parseBranch(status[0])
-	clean := (len(status[1:]) == 0)
-	stash := getStashCount()
+	s.branch, s.ahead, s.behind = parseBranch(status[0])
+	s.clean = (len(status[1:]) == 0)
+	s.stash = getStashCount()
+}
 
-	return []Segment{git{s.Style, branch, ahead, behind, stash, clean}}
+func (s Git) Print(writer io.Writer, segments []Segment, current int) {
+	ff := []PartFormatter{
+		PartFormatter{" ", nil, nil},
+		PartFormatter{s.branch, nil, nil},
+	}
+	if s.ahead != 0 {
+		ff = append(ff, PartFormatter{s.AheadSymbol + strconv.Itoa(s.ahead), s.AheadColor, nil})
+	}
+	if s.behind != 0 {
+		ff = append(ff, PartFormatter{s.BehindSymbol + strconv.Itoa(s.behind), s.BehindColor, nil})
+	}
+	if !s.clean || s.stash != 0 {
+		//ff = append(ff, PartFormatter{ "|", nil, nil })
+		if s.stash != 0 {
+			ff = append(ff, PartFormatter{s.StashSymbol, s.StashColor, nil})
+		}
+		if !s.clean {
+			ff = append(ff, PartFormatter{s.DirtySymbol, s.DirtyColor, nil})
+		}
+	}
+	ff = append(ff, PartFormatter{" ", nil, nil})
+	FormatParts(writer, s.Style, segments, current, ff)
+}
+
+func (s Git) GetStyle(segments []Segment, current int) format.Style {
+	return s.Style
 }
 
 func parseBranch(str string) (string, int, int) {
@@ -74,41 +129,3 @@ func getStashCount() int {
 	}
 	return len(strings.Split(stashOutput, "\n"))
 }
-
-type git struct {
-	style  format.Style
-	branch string
-	ahead  int
-	behind int
-	stash  int
-	clean  bool
-}
-
-func (s git) Print(writer io.Writer, segments []Segment, current int) {
-	ff := []PartFormatter{
-		PartFormatter{" ", nil, nil},
-		PartFormatter{s.branch, nil, nil},
-	}
-	if s.ahead != 0 {
-		ff = append(ff, PartFormatter{"\uf139" + strconv.Itoa(s.ahead), nil, nil})
-	}
-	if s.behind != 0 {
-		ff = append(ff, PartFormatter{"\uf13a" + strconv.Itoa(s.behind), nil, nil})
-	}
-	if !s.clean || s.stash != 0 {
-		//ff = append(ff, PartFormatter{ "|", nil, nil })
-		if s.stash != 0 {
-			ff = append(ff, PartFormatter{"\uf111", format.Blue, nil})
-		}
-		if !s.clean {
-			ff = append(ff, PartFormatter{"\uf057", format.Red, nil})
-		}
-	}
-	ff = append(ff, PartFormatter{" ", nil, nil})
-	FormatParts(writer, s.style, segments, current, ff)
-}
-
-func (s git) GetStyle(segments []Segment, current int) format.Style {
-	return s.style
-}
-

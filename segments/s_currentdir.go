@@ -8,53 +8,82 @@ import (
 	"strings"
 )
 
-// CurrentDir segment display current working directory.
-type currentDir struct {
-	style       format.Style
-	styleUnit   format.Style
-	isPlain     bool
-	separator   string
-	fgSeparator format.Color
+// CurrentDirBlock segment prints current working directory with splitted folders.
+type CurrentDirBlock struct {
+	Style       format.Style
+	StyleUnit   format.Style
+	Separator   string
+	MaxDepth    uint
+	Ellipsis    string
 	directories []string
 }
 
-func (s currentDir) Print(writer io.Writer, segments []Segment, current int) {
-	for i, v := range s.directories {
-		s.directories[i] = " " + v + " "
-	}
-
-	if s.isPlain {
-		ff := []PartFormatter{}
-		for i := 0; i < len(s.directories)-1; i += 1 {
-			ff = append(ff, PartFormatter{s.directories[i], nil, nil})
-			ff = append(ff, PartFormatter{s.separator, s.fgSeparator, nil})
-		}
-		ff = append(ff, PartFormatter{s.directories[len(s.directories)-1], nil, nil})
-		FormatParts(writer, s.style, segments, current, ff)
-	} else {
-		FormatStringArrayBlock(writer, s.directories, s.style, s.separator, format.StyleChameleon{}, segments, current)
-	}
+// Create a CurrentDirBlock segment by splitting each directory and apply a style to it.
+func NewCurrentDirBlock() *CurrentDirBlock {
+	return &CurrentDirBlock{
+		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
+		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
+		">", 0, "\u2026",
+		[]string{}}
 }
 
-func (s currentDir) GetStyle(segments []Segment, current int) format.Style {
-	if !s.isPlain && len(s.directories) == 1 {
-		return s.styleUnit
-	}
-	return s.style
+func (s *CurrentDirBlock) Load() {
+	s.directories = getCwdEllipsed(s.MaxDepth, s.Ellipsis)
 }
 
-// Create a CurrentDir segment with a unique style for all path.
-// Separators are simple string.
-type CurrentDirPlainLoader struct {
+func (s CurrentDirBlock) Print(writer io.Writer, segments []Segment, current int) {
+	style := s.Style
+	if len(s.directories) == 1 {
+		style = s.StyleUnit
+	}
+	FormatStringArrayBlock(writer, s.directories, style, s.Separator, format.StyleChameleon{}, segments, current)
+}
+
+func (s CurrentDirBlock) GetStyle(segments []Segment, current int) format.Style {
+	if len(s.directories) == 1 {
+		return s.StyleUnit
+	}
+	return s.Style
+}
+
+// CurrentDirPlain segment prints current working directory.
+type CurrentDirPlain struct {
 	Style       format.Style
-	StyleUnit   format.Style
 	Separator   string
 	FgSeparator format.Color
 	MaxDepth    uint
 	Ellipsis    string
+	directories []string
 }
 
-func (s CurrentDirPlainLoader) Load() []Segment {
+// Create a CurrentDirPlain segment with a single style for all folders.
+func NewCurrentDirPlain() *CurrentDirPlain {
+	return &CurrentDirPlain{
+		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
+		">", format.White,
+		0, "\u2026",
+		[]string{}}
+}
+
+func (s *CurrentDirPlain) Load() {
+	s.directories = getCwdEllipsed(s.MaxDepth, s.Ellipsis)
+}
+
+func (s CurrentDirPlain) Print(writer io.Writer, segments []Segment, current int) {
+	ff := []PartFormatter{}
+	for i := 0; i < len(s.directories)-1; i += 1 {
+		ff = append(ff, PartFormatter{s.directories[i], nil, nil})
+		ff = append(ff, PartFormatter{s.Separator, s.FgSeparator, nil})
+	}
+	ff = append(ff, PartFormatter{s.directories[len(s.directories)-1], nil, nil})
+	FormatParts(writer, s.Style, segments, current, ff)
+}
+
+func (s CurrentDirPlain) GetStyle(segments []Segment, current int) format.Style {
+	return s.Style
+}
+
+func getCwdEllipsed(maxDepth uint, ellipsis string) []string {
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -66,40 +95,14 @@ func (s CurrentDirPlainLoader) Load() []Segment {
 	}
 
 	directories := strings.Split(dir, "/")
-	if s.MaxDepth != 0 && len(directories) > int(s.MaxDepth) {
-		directories = directories[len(directories)-int(s.MaxDepth):]
-		directories[0] = s.Ellipsis
+	if maxDepth != 0 && len(directories) > int(maxDepth) {
+		directories = directories[len(directories)-int(maxDepth):]
+		directories[0] = ellipsis
 	}
 
-	return []Segment{currentDir{s.Style, s.StyleUnit, true, s.Separator, s.FgSeparator, directories}}
-}
-
-// Create a CurrentDir segment by spliting each directory and apply a style to it.
-// Separators are transition characters.
-type CurrentDirBlockLoader struct {
-	Style     format.Style
-	StyleUnit format.Style
-	Separator string
-	MaxDepth  uint
-	Ellipsis  string
-}
-
-func (s CurrentDirBlockLoader) Load() []Segment {
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
+	for i, v := range directories {
+		directories[i] = " " + v + " "
 	}
 
-	home_dir := os.Getenv("HOME")
-	if strings.Index(dir, home_dir) == 0 {
-		dir = strings.Replace(dir, home_dir, "~", 1)
-	}
-
-	directories := strings.Split(dir, "/")
-	if s.MaxDepth != 0 && len(directories) > int(s.MaxDepth) {
-		directories = directories[len(directories)-int(s.MaxDepth):]
-		directories[0] = s.Ellipsis
-	}
-
-	return []Segment{currentDir{s.Style, s.StyleUnit, false, s.Separator, nil, directories}}
+	return directories
 }
