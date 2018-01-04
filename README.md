@@ -5,6 +5,8 @@
 
 *It is mainly a personal project to learn [Go Programming Language](https://golang.org/).*
 
+![Example of gompt prompt](./screenshot.jpg)
+
 I share it, feel free to use and to improve.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
