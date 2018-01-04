@@ -92,7 +92,7 @@ type StyleChameleon struct {
 }
 
 // Create a StyleChameleon.
-func NewStyleChameleon(fg Brush, bg Brush) *StyleChameleon {
+func NewStyleChameleon() *StyleChameleon {
 	return &StyleChameleon{}
 }
 
