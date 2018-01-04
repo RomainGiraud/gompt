@@ -101,7 +101,6 @@ var (
 	Magenta = Color4{5}
 	Cyan    = Color4{6}
 	White   = Color4{7}
-	Default = Color4{9}
 )
 
 // Construct a color from a string.
@@ -151,8 +150,6 @@ func NewColor(str string) Color {
 		return Color4{6}
 	case "white":
 		return Color4{7}
-	case "default":
-		return Color4{9}
 	}
 
 	panic("cannot parse color")

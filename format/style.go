@@ -104,14 +104,14 @@ type StyleSnapshotChameleon struct {
 }
 
 func (s StyleSnapshotChameleon) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
-	fg := NewColor("default")
+	var fg Color = White
 	if prev != nil {
 		if c := prev.GetBg(); c != nil {
 			fg = c
 		}
 	}
 
-	bg := NewColor("default")
+	var bg Color = Black
 	if next != nil {
 		if c := next.GetBg(); c != nil {
 			bg = c
