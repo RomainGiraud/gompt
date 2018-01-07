@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/RomainGiraud/gompt/format"
-	"github.com/RomainGiraud/gompt/segments"
+	"github.com/RomainGiraud/gompt/segment"
 )
 
 func main() {
@@ -24,26 +24,26 @@ func main() {
 			format.UniBrush{format.NewColor("8")})
 	}
 
-	sep := segments.NewTextStylized("\ue0b0", format.NewStyleChameleon())
+	sep := segment.NewTextStylized("\ue0b0", format.NewStyleChameleon())
 
-	var prompt segments.SegmentList
-	prompt = append(prompt, segments.NewTextStylized("\uf444", exitStatusStyle))
-	prompt = append(prompt, segments.NewFullUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})))
+	var prompt segment.SegmentList
+	prompt = append(prompt, segment.NewTextStylized("\uf444", exitStatusStyle))
+	prompt = append(prompt, segment.NewFullUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.NewColor("8")})))
 	prompt = append(prompt, sep)
-	prompt = append(prompt, segments.NewFullHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})))
+	prompt = append(prompt, segment.NewFullHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})))
 	prompt = append(prompt, sep)
 
-	if seg, err := segments.NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Yellow})); err == nil {
+	if seg, err := segment.NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Yellow})); err == nil {
 		prompt = append(prompt, seg)
 		prompt = append(prompt, sep)
 	}
 
-	if seg, err := segments.NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Magenta})); err == nil {
+	if seg, err := segment.NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Magenta})); err == nil {
 		prompt = append(prompt, seg)
 		prompt = append(prompt, sep)
 	}
 
-	cwd := segments.NewCurrentDirBlock()
+	cwd := segment.NewCurrentDirBlock()
 	cwd.Style = format.NewStyleStandard(
 		format.UniBrush{format.NewColor("#333")},
 		format.GradientBrush{format.NewColor("#aaa"), format.NewColor("#eee")})
@@ -54,7 +54,7 @@ func main() {
 	cwd.MaxDepth = 3
 	prompt = append(prompt, cwd)
 
-	if seg, err := segments.NewGit(); err == nil {
+	if seg, err := segment.NewGit(); err == nil {
 		prompt = append(prompt, sep)
 
 		seg.Style = format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan})
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	prompt = append(prompt, sep)
-	prompt = append(prompt, segments.NewText(" "))
+	prompt = append(prompt, segment.NewText(" "))
 
 	var buffer bytes.Buffer
 	prompt.Render(&buffer)
