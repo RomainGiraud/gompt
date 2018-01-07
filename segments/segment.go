@@ -6,8 +6,9 @@ import (
 )
 
 // A segment is a displayed element of the prompt.
+// It is advisable to create a segment in a New* function.
 type Segment interface {
-	// Initialize hidden elements of segment
+	// Initialize elements of segment needed for Print and GetStyle methods
 	Load()
 	// Print segment i in w. All segments are in s.
 	Print(w io.Writer, s []Segment, i int)

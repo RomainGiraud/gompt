@@ -33,15 +33,13 @@ func main() {
 	prompt = append(prompt, segments.NewFullHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Blue})))
 	prompt = append(prompt, sep)
 
-	venv := segments.NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Yellow}))
-	if venv != nil {
-		prompt = append(prompt, venv)
+	if seg, err := segments.NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Yellow})); err == nil {
+		prompt = append(prompt, seg)
 		prompt = append(prompt, sep)
 	}
 
-	direnv := segments.NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Magenta}))
-	if direnv != nil {
-		prompt = append(prompt, direnv)
+	if seg, err := segments.NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Magenta})); err == nil {
+		prompt = append(prompt, seg)
 		prompt = append(prompt, sep)
 	}
 
@@ -56,11 +54,11 @@ func main() {
 	cwd.MaxDepth = 3
 	prompt = append(prompt, cwd)
 
-	if git := segments.NewGit(); git != nil {
+	if seg, err := segments.NewGit(); err == nil {
 		prompt = append(prompt, sep)
 
-		git.Style = format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan})
-		prompt = append(prompt, git)
+		seg.Style = format.NewStyleStandard(format.UniBrush{format.Black}, format.UniBrush{format.Cyan})
+		prompt = append(prompt, seg)
 	}
 
 	prompt = append(prompt, sep)

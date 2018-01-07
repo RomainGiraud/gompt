@@ -1,6 +1,7 @@
 package segments
 
 import (
+	"errors"
 	"github.com/RomainGiraud/gompt/format"
 	"io"
 	"strconv"
@@ -26,11 +27,11 @@ type Git struct {
 }
 
 // Create a Git segment.
-func NewGit() *Git {
+func NewGit() (*Git, error) {
 	// in a repository?
 	_, err := ExecCommand("git", "status")
 	if err != nil {
-		return nil
+		return nil, errors.New("Not a git repository.")
 	}
 
 	return &Git{
@@ -39,7 +40,7 @@ func NewGit() *Git {
 		"\uf13a", format.Black,
 		"\uf024", format.Black,
 		"\uf057", format.Red,
-		"", 0, 0, 0, true}
+		"", 0, 0, 0, true}, nil
 }
 
 func (s *Git) Load() {

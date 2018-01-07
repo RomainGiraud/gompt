@@ -15,10 +15,7 @@ func ExecCommand(name string, arg ...string) (string, error) {
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
-	if err != nil {
-		return "", err
-	}
-	return strings.Trim(out.String(), "\n"), nil
+	return strings.Trim(out.String(), "\n"), err
 }
 
 // Format a string with a style.
