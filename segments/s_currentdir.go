@@ -85,9 +85,9 @@ func getCwdEllipsed(maxDepth uint, ellipsis string) []string {
 		log.Fatal(err)
 	}
 
-	home_dir := os.Getenv("HOME")
-	if strings.Index(dir, home_dir) == 0 {
-		dir = strings.Replace(dir, home_dir, "~", 1)
+	homeDir := os.Getenv("HOME")
+	if strings.Index(dir, homeDir) == 0 {
+		dir = strings.Replace(dir, homeDir, "~", 1)
 	}
 
 	directories := strings.Split(dir, "/")

@@ -50,10 +50,10 @@ func NewGit() (*Git, error) {
 	}
 
 	info := strings.Split(out, "\n")
-	git_dir := info[0]
-	in_gitdir := (info[1] == "true")
-	is_bare := (info[2] == "true")
-	in_wd := (info[3] == "true")
+	gitDir := info[0]
+	inGitDir := (info[1] == "true")
+	isBare := (info[2] == "true")
+	inWd := (info[3] == "true")
 	sha := ""
 	if err == nil {
 		sha = info[4]
@@ -65,44 +65,44 @@ func NewGit() (*Git, error) {
 	total := ""
 	detached := false
 
-	if stat, err := os.Stat(git_dir + "/rebase-merge"); err == nil && stat.IsDir() {
-		branch = readFirstLine(git_dir + "/rebase-merge/head-name")
-		step = readFirstLine(git_dir + "/rebase-merge/msgnum")
-		total = readFirstLine(git_dir + "/rebase-merge/end")
-		if stat, err = os.Stat(git_dir + "/rebase-merge/interactive"); err == nil && stat.Mode().IsRegular() {
+	if stat, err := os.Stat(gitDir + "/rebase-merge"); err == nil && stat.IsDir() {
+		branch = readFirstLine(gitDir + "/rebase-merge/head-name")
+		step = readFirstLine(gitDir + "/rebase-merge/msgnum")
+		total = readFirstLine(gitDir + "/rebase-merge/end")
+		if stat, err = os.Stat(gitDir + "/rebase-merge/interactive"); err == nil && stat.Mode().IsRegular() {
 			state = "|REBASE-i"
 		} else {
 			state = "|REBASE-m"
 		}
 	} else {
-		if stat, err := os.Stat(git_dir + "/rebase-apply"); err == nil && stat.IsDir() {
-			step = readFirstLine(git_dir + "/rebase-apply/next")
-			total = readFirstLine(git_dir + "/rebase-apply/last")
-			if stat, err = os.Stat(git_dir + "/rebase-apply/rebasing"); err == nil && stat.Mode().IsRegular() {
-				branch = readFirstLine(git_dir + "/rebase-apply/head-name")
+		if stat, err := os.Stat(gitDir + "/rebase-apply"); err == nil && stat.IsDir() {
+			step = readFirstLine(gitDir + "/rebase-apply/next")
+			total = readFirstLine(gitDir + "/rebase-apply/last")
+			if stat, err = os.Stat(gitDir + "/rebase-apply/rebasing"); err == nil && stat.Mode().IsRegular() {
+				branch = readFirstLine(gitDir + "/rebase-apply/head-name")
 				state = "|REBASE"
-			} else if stat, err = os.Stat(git_dir + "/rebase-apply/applying"); err == nil && stat.Mode().IsRegular() {
+			} else if stat, err = os.Stat(gitDir + "/rebase-apply/applying"); err == nil && stat.Mode().IsRegular() {
 				state = "|AM"
 			} else {
 				state = "|AM/REBASE"
 			}
-		} else if stat, err = os.Stat(git_dir + "/MERGE_HEAD"); err == nil && stat.Mode().IsRegular() {
+		} else if stat, err = os.Stat(gitDir + "/MERGE_HEAD"); err == nil && stat.Mode().IsRegular() {
 			state = "|MERGING"
-		} else if stat, err = os.Stat(git_dir + "/CHERRY_PICK_HEAD"); err == nil && stat.Mode().IsRegular() {
+		} else if stat, err = os.Stat(gitDir + "/CHERRY_PICK_HEAD"); err == nil && stat.Mode().IsRegular() {
 			state = "|CHERRY-PICKING"
-		} else if stat, err = os.Stat(git_dir + "/REVERT_HEAD"); err == nil && stat.Mode().IsRegular() {
+		} else if stat, err = os.Stat(gitDir + "/REVERT_HEAD"); err == nil && stat.Mode().IsRegular() {
 			state = "|REVERTING"
-		} else if stat, err = os.Stat(git_dir + "/BISECT_LOG"); err == nil && stat.Mode().IsRegular() {
+		} else if stat, err = os.Stat(gitDir + "/BISECT_LOG"); err == nil && stat.Mode().IsRegular() {
 			state = "|BISECTING"
 		}
 	}
 
 	if len(branch) != 0 {
-	} else if stat, err := os.Stat(git_dir + "/HEAD"); err == nil && (stat.Mode()&os.ModeSymlink) != 0 {
+	} else if stat, err := os.Stat(gitDir + "/HEAD"); err == nil && (stat.Mode()&os.ModeSymlink) != 0 {
 		branch, _ = ExecCommand("git", "symbolic-ref", "HEAD")
 	} else {
 		head := ""
-		if head = readFirstLine(git_dir + "/HEAD"); len(head) == 0 {
+		if head = readFirstLine(gitDir + "/HEAD"); len(head) == 0 {
 			return nil, errors.New("Cannot read .git/HEAD")
 		}
 		branch = strings.TrimPrefix(head, "ref: ")
@@ -126,13 +126,13 @@ func NewGit() (*Git, error) {
 	untracked := false
 	ahead, behind := 0, 0
 
-	if in_gitdir {
-		if is_bare {
+	if inGitDir {
+		if isBare {
 			bare = true
 		} else {
-			branch = "GIT_DIR!"
+			branch = "gitDir!"
 		}
-	} else if in_wd {
+	} else if inWd {
 		out, err = ExecCommand("git", "diff", "--no-ext-diff", "--quiet")
 		unstaged = (err != nil)
 
