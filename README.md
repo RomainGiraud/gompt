@@ -36,6 +36,7 @@ You have to [install](https://golang.org/doc/install) Go toolchain on your syste
 
 Get source code with `go` tool:
 ```bash
+cd $GOPATH
 go get github.com/RomainGiraud/gompt
 ```
 
@@ -43,6 +44,7 @@ Then you can modify your configuration in `main.go` file (see [Configuration](#c
 
 Compile and install it:
 ```bash
+cd $GOPATH/src/github.com/RomainGiraud/gompt/
 go install
 cp $GOPATH/bin/gompt ~/bin/
 ```
