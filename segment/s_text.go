@@ -39,7 +39,7 @@ type Text struct {
 // To display dollar value, double it:
 //   $$
 func NewText(text string) *Text {
-	return NewTextStylized(text, format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewTextStylized(text, format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a Text segment with a style and interprets variables and commands.
@@ -50,9 +50,9 @@ func NewTextStylized(text string, style format.Style) *Text {
 func (s *Text) Load() {
 }
 
-func (s Text) Print(writer io.Writer, segments []Segment, current int) {
+func (s Text) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
 	text := os.Expand(s.Text, getenv)
-	FormatString(writer, text, s.Style, segments, current)
+	FormatString(writer, sh, text, s.Style, segments, current)
 }
 
 func (s Text) GetStyle(segments []Segment, current int) format.Style {

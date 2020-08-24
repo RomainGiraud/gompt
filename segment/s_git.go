@@ -154,16 +154,16 @@ func NewGit() (*Git, error) {
 	}
 
 	return &Git{
-		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}), // Style
+		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Default}), // Style
 		format.Red,        // DetachedColor
 		format.Magenta,    // BareColor
-		format.Black,      // StateColor
-		"+", format.Black, // Staged
-		"*", format.Black, // Unstaged
-		"\uf057", format.Black, // Untracked
-		"\uf024", format.Black, // Stash
-		"\uf139", format.Black, // Ahead
-		"\uf13a", format.Black, // Behind
+		format.Default,      // StateColor
+		"+", format.Default, // Staged
+		"*", format.Default, // Unstaged
+		"\uf057", format.Default, // Untracked
+		"\uf024", format.Default, // Stash
+		"\uf139", format.Default, // Ahead
+		"\uf13a", format.Default, // Behind
 
 		strings.TrimPrefix(branch, "refs/heads/"), // branch
 		state,     // state
@@ -196,7 +196,7 @@ func readFirstLine(filename string) string {
 func (s *Git) Load() {
 }
 
-func (s Git) Print(writer io.Writer, segments []Segment, current int) {
+func (s Git) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
 	ff := []PartFormatter{}
 
 	ff = append(ff, PartFormatter{" ", nil, nil})
@@ -235,7 +235,7 @@ func (s Git) Print(writer io.Writer, segments []Segment, current int) {
 
 	ff = append(ff, PartFormatter{" ", nil, nil})
 
-	FormatParts(writer, s.Style, segments, current, ff)
+	FormatParts(writer, sh, s.Style, segments, current, ff)
 }
 
 func (s Git) GetStyle(segments []Segment, current int) format.Style {

@@ -55,10 +55,18 @@ Add these lines to your `~/.bashrc`:
 
 ```bash
 function _update_ps1() {
-    export PS1="$(gompt -s $?)"
+    export PS1="$(gompt -e $?)"
 }
 
 export PROMPT_COMMAND="_update_ps1;"
+```
+
+### Zsh
+
+Add these lines to your `~/.zshrc`:
+
+```zsh
+precmd() { export PS1="$(gompt -e $? -s zsh)" }
 ```
 
 ### Fonts

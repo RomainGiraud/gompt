@@ -13,7 +13,7 @@ type Style interface {
 // StyleSnapshot represents an extract of a Style at a given percent.
 type StyleSnapshot interface {
 	// Format a string
-	Format(io.Writer, string, StyleSnapshot, StyleSnapshot)
+	Format(io.Writer, Shell, string, StyleSnapshot, StyleSnapshot)
 	// Return foreground
 	GetFg() Color
 	// Return background
@@ -62,10 +62,10 @@ type StyleSnapshotStandard struct {
 	attributes []Attribute
 }
 
-func (s StyleSnapshotStandard) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
+func (s StyleSnapshotStandard) Format(writer io.Writer, sh Shell, str string, prev StyleSnapshot, next StyleSnapshot) {
 	s.attributes = append(s.attributes, Bg(s.bg))
 	s.attributes = append(s.attributes, Fg(s.fg))
-	Fformat(writer, str, s.attributes...)
+	Fformat(writer, sh, str, s.attributes...)
 }
 
 func (s StyleSnapshotStandard) GetFg() Color {
@@ -103,22 +103,22 @@ func (s StyleChameleon) ValueAt(t float32) StyleSnapshot {
 type StyleSnapshotChameleon struct {
 }
 
-func (s StyleSnapshotChameleon) Format(writer io.Writer, str string, prev StyleSnapshot, next StyleSnapshot) {
-	var fg Color = White
+func (s StyleSnapshotChameleon) Format(writer io.Writer, sh Shell, str string, prev StyleSnapshot, next StyleSnapshot) {
+	var fg Color = Default
 	if prev != nil {
 		if c := prev.GetBg(); c != nil {
 			fg = c
 		}
 	}
 
-	var bg Color = Black
+	var bg Color = Default
 	if next != nil {
 		if c := next.GetBg(); c != nil {
 			bg = c
 		}
 	}
 
-	Fformat(writer, str, Bg(bg), Fg(fg))
+	Fformat(writer, sh, str, Bg(bg), Fg(fg))
 }
 
 func (s StyleSnapshotChameleon) GetFg() Color {

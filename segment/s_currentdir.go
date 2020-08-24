@@ -21,8 +21,8 @@ type CurrentDirBlock struct {
 // Create a CurrentDirBlock segment by splitting each directory and apply a style to it.
 func NewCurrentDirBlock() *CurrentDirBlock {
 	return &CurrentDirBlock{
-		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
-		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
+		format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}),
+		format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}),
 		">", 0, "\u2026",
 		[]string{}}
 }
@@ -31,8 +31,8 @@ func (s *CurrentDirBlock) Load() {
 	s.directories = getCwdEllipsed(s.MaxDepth, s.Ellipsis)
 }
 
-func (s CurrentDirBlock) Print(writer io.Writer, segments []Segment, current int) {
-	FormatStringArrayBlock(writer, s.directories, s.GetStyle(segments, current), s.Separator, format.StyleChameleon{}, segments, current)
+func (s CurrentDirBlock) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
+	FormatStringArrayBlock(writer, sh, s.directories, s.GetStyle(segments, current), s.Separator, format.StyleChameleon{}, segments, current)
 }
 
 func (s CurrentDirBlock) GetStyle(segments []Segment, current int) format.Style {
@@ -55,7 +55,7 @@ type CurrentDirPlain struct {
 // Create a CurrentDirPlain segment with a single style for all folders.
 func NewCurrentDirPlain() *CurrentDirPlain {
 	return &CurrentDirPlain{
-		format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}),
+		format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}),
 		">", format.White,
 		0, "\u2026",
 		[]string{}}
@@ -65,14 +65,14 @@ func (s *CurrentDirPlain) Load() {
 	s.directories = getCwdEllipsed(s.MaxDepth, s.Ellipsis)
 }
 
-func (s CurrentDirPlain) Print(writer io.Writer, segments []Segment, current int) {
+func (s CurrentDirPlain) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
 	ff := []PartFormatter{}
 	for i := 0; i < len(s.directories)-1; i += 1 {
 		ff = append(ff, PartFormatter{s.directories[i], nil, nil})
 		ff = append(ff, PartFormatter{s.Separator, s.FgSeparator, nil})
 	}
 	ff = append(ff, PartFormatter{s.directories[len(s.directories)-1], nil, nil})
-	FormatParts(writer, s.Style, segments, current, ff)
+	FormatParts(writer, sh, s.Style, segments, current, ff)
 }
 
 func (s CurrentDirPlain) GetStyle(segments []Segment, current int) format.Style {

@@ -13,7 +13,7 @@ type Hostname struct {
 
 // Create a Hostname segment.
 func NewHostname() *Hostname {
-	return NewHostnameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a Hostname segment with a style.
@@ -24,12 +24,12 @@ func NewHostnameStylized(style format.Style) *Hostname {
 func (s *Hostname) Load() {
 }
 
-func (s Hostname) Print(writer io.Writer, segments []Segment, current int) {
+func (s Hostname) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
 	h, err := os.Hostname()
 	if err != nil {
 		return
 	}
-	FormatString(writer, " "+h+" ", s.Style, segments, current)
+	FormatString(writer, sh, " "+h+" ", s.Style, segments, current)
 }
 
 func (s Hostname) GetStyle(segments []Segment, current int) format.Style {
@@ -45,18 +45,18 @@ type FullHostname struct {
 
 // Create a FullHostname segment.
 func NewFullHostname() *FullHostname {
-	return NewFullHostnameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewFullHostnameStylized(format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a FullHostname segment with a style.
 func NewFullHostnameStylized(style format.Style) *FullHostname {
-	return &FullHostname{style, "\uf44c", format.Black}
+	return &FullHostname{style, "\uf44c", format.Default}
 }
 
 func (s *FullHostname) Load() {
 }
 
-func (s FullHostname) Print(writer io.Writer, segments []Segment, current int) {
+func (s FullHostname) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
 	h, err := os.Hostname()
 	if err != nil {
 		return
@@ -70,7 +70,7 @@ func (s FullHostname) Print(writer io.Writer, segments []Segment, current int) {
 	}
 	ff = append(ff, PartFormatter{h, nil, nil})
 	ff = append(ff, PartFormatter{" ", nil, nil})
-	FormatParts(writer, s.Style, segments, current, ff)
+	FormatParts(writer, sh, s.Style, segments, current, ff)
 }
 
 func (s FullHostname) GetStyle(segments []Segment, current int) format.Style {

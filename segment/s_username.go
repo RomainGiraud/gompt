@@ -13,7 +13,7 @@ type Username struct {
 
 // Create a Username segment.
 func NewUsername() *Username {
-	return NewUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewUsernameStylized(format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a Username segment with a style.
@@ -24,12 +24,12 @@ func NewUsernameStylized(style format.Style) *Username {
 func (s *Username) Load() {
 }
 
-func (s Username) Print(writer io.Writer, segments []Segment, current int) {
+func (s Username) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
 	u, err := user.Current()
 	if err != nil {
 		return
 	}
-	FormatString(writer, " "+u.Username+" ", s.Style, segments, current)
+	FormatString(writer, sh, " "+u.Username+" ", s.Style, segments, current)
 }
 
 func (s Username) GetStyle(segments []Segment, current int) format.Style {
@@ -45,12 +45,12 @@ type FullUsername struct {
 
 // Create a FullUsername segment.
 func NewFullUsername() *FullUsername {
-	return NewFullUsernameStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewFullUsernameStylized(format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a FullUsername segment with a style.
 func NewFullUsernameStylized(style format.Style) *FullUsername {
-	return &FullUsername{style, format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}), ""}
+	return &FullUsername{style, format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}), ""}
 }
 
 func (s *FullUsername) Load() {
@@ -61,8 +61,8 @@ func (s *FullUsername) Load() {
 	s.username = u.Username
 }
 
-func (s FullUsername) Print(writer io.Writer, segments []Segment, current int) {
-	FormatString(writer, " "+s.username+" ", s.GetStyle(segments, current), segments, current)
+func (s FullUsername) Print(writer io.Writer, sh format.Shell, segments []Segment, current int) {
+	FormatString(writer, sh, " "+s.username+" ", s.GetStyle(segments, current), segments, current)
 }
 
 func (s FullUsername) GetStyle(segments []Segment, current int) format.Style {

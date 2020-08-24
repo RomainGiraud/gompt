@@ -10,7 +10,7 @@ import (
 // Create a Text segment.
 // If environment variable env exists, a Text segment is loaded with the value returned from fn.
 func NewCheckEnv(env string, fn func(string) string) (*Text, error) {
-	return NewCheckEnvStylized(env, fn, format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewCheckEnvStylized(env, fn, format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a Text segment with a style.
@@ -25,7 +25,7 @@ func NewCheckEnvStylized(env string, fn func(string) string, style format.Style)
 
 // Create a Text segment displaying direnv name.
 func NewDirEnv() (*Text, error) {
-	return NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewDirEnvStylized(format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a Text segment displaying direnv name with a style.
@@ -35,7 +35,7 @@ func NewDirEnvStylized(style format.Style) (*Text, error) {
 
 // Create a Text segment displaying virtualenv name.
 func NewVirtualEnv() (*Text, error) {
-	return NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.White}, format.UniBrush{format.Black}))
+	return NewVirtualEnvStylized(format.NewStyleStandard(format.UniBrush{format.Default}, format.UniBrush{format.Default}))
 }
 
 // Create a Text segment displaying virtualenv name with a style.

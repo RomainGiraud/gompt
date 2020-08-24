@@ -1,22 +1,23 @@
 package main
 
 import (
-	"bytes"
 	"flag"
-	"fmt"
 	"github.com/RomainGiraud/gompt/format"
 	"github.com/RomainGiraud/gompt/segment"
 )
 
 func main() {
 	var lastCommandStatus int
-	flag.IntVar(&lastCommandStatus, "s", 0, "exit status")
+	var shellType string
+	flag.IntVar(&lastCommandStatus, "e", 0, "exit status")
+	flag.StringVar(&shellType, "s", "bash", "choose shell [bash, zsh]")
+	// TODO detect framebuffer terminal (simple prompt)
 	flag.Parse()
 
 	var exitStatusStyle *format.StyleStandard
 	if lastCommandStatus == 0 {
 		exitStatusStyle = format.NewStyleStandard(
-			format.UniBrush{format.NewColor("#0f0")},
+			format.UniBrush{format.NewColor("#ddd")},
 			format.UniBrush{format.NewColor("8")})
 	} else {
 		exitStatusStyle = format.NewStyleStandard(
@@ -64,7 +65,11 @@ func main() {
 	prompt = append(prompt, sep)
 	prompt = append(prompt, segment.NewText(" "))
 
-	var buffer bytes.Buffer
-	prompt.Render(&buffer)
-	fmt.Println(buffer.String())
+	var sh format.Shell
+	if (shellType == "zsh") {
+		sh = format.Zsh {}
+	} else {
+		sh = format.Bash {}
+	}
+	prompt.Print(sh)
 }
